@@ -3,7 +3,8 @@
             [io.pedestal.http.route :as route]
             [io.pedestal.http.content-negotiation :as conneg]
             [clojure.string :as str]
-            [clojure.data.json :as json]))         ;; <3>
+            [clojure.data.json :as json]
+            [cludio.config :as config]))         ;; <3>
 
 (def unmentionables #{"YHWH" "Voldemort" "Mxyzptlk" "Rumplestiltskin" "曹操"})
 
@@ -67,8 +68,7 @@
 
 (def service-map
   {::http/routes routes
-   ::http/type   :jetty
-   ::http/port   8890})
+   ::http/type   :jetty})
 
 (defn start []
   (http/start (http/create-server service-map)))
@@ -76,15 +76,25 @@
                                                                                         ;; For interactive development
 (defonce server (atom nil))                                                             ;; <1>
 
-(defn start-dev []
+(defn start-dev [config]
   (reset! server                                                                        ;; <2>
           (http/start (http/create-server
                        (assoc service-map
-                              ::http/join? false)))))                                   ;; <3>
+                              ::http/join? false
+                              ::http/port (-> config :server :port))))))                                   ;; <3>
 
 (defn stop-dev []
   (http/stop @server))
 
 (defn restart []                                                                        ;; <4>
   (stop-dev)
-  (start-dev))
+  (let [config (config/read-config)] 
+    (start-dev config)))
+
+(defn -main
+  []
+  (let [config (config/read-config)]
+    (println "Starting Cludio with config" config)
+    (start-dev config)))
+
+(comment (-main) (stop-dev) (restart))
