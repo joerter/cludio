@@ -4,7 +4,9 @@
             [io.pedestal.http.content-negotiation :as conneg]
             [clojure.string :as str]
             [clojure.data.json :as json]
-            [cludio.config :as config]))         ;; <3>
+            [cludio.config :as config]
+            [com.stuartsierra.component :as component]
+            [cludio.components.example-component :as example-component]))         ;; <3>
 
 (def unmentionables #{"YHWH" "Voldemort" "Mxyzptlk" "Rumplestiltskin" "曹操"})
 
@@ -91,10 +93,15 @@
   (let [config (config/read-config)] 
     (start-dev config)))
 
+(defn api-system
+  [config]
+  (component/system-map
+    :example-component (example-component/new-example-component config)))
+
 (defn -main
   []
-  (let [config (config/read-config)]
-    (println "Starting Cludio with config" config)
-    (start-dev config)))
+  (let [system (-> (config/read-config) (api-system) (component/start-system))]
+   (println "Starting Cludio with system" system) 
+    ))
 
 (comment (-main) (stop-dev) (restart))
