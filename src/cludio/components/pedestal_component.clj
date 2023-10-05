@@ -5,7 +5,7 @@
 
 (defn echo [request]
   {:status 200
-   :body "Clojure is incredible."})
+   :body "John is cool"})
 
 (def routes
   (route/expand-routes                                   
