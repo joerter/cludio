@@ -1,11 +1,14 @@
 (ns dev
   (:require
     [cludio.core :as core]
+    [cludio.config :as config]
     [com.stuartsierra.component.repl :as component-repl]))
 
 (component-repl/set-init
   (fn [old-system]
-    (core/api-system {:server {:port 3001}})))
+    (let [port (-> (config/read-config) :server :port)] (core/api-system {:server {:port port}}))))
 
 (comment
-  (component-repl/reset))
+  (component-repl/reset)
+  (-> (config/read-config) :server :port))
+
