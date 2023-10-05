@@ -5,7 +5,7 @@
 
 (defn echo [request]
   {:status 200
-   :body "Hello!"})
+   :body "Clojure is incredible."})
 
 (def routes
   (route/expand-routes                                   
@@ -15,7 +15,7 @@
   component/Lifecycle
 
   (start [component]
-    (println "Starting PedestalComponent")
+    (println "Starting Pedestal...")
     (let [server (-> {::http/routes routes
                       ::http/type :jetty
                       ::http/join? false
@@ -25,7 +25,7 @@
       (assoc component :server server)))
 
   (stop [component]
-    (println "Stopping PedestalComponent")
+    (println "Stopping Pedestal...")
     (when-let [server (:server component)]
       (http/stop server))
     (assoc component :server nil)))

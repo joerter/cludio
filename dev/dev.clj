@@ -8,7 +8,11 @@
   (fn [old-system]
     (let [port (-> (config/read-config) :server :port)] (core/api-system {:server {:port port}}))))
 
+(defn reload []
+  (component-repl/reset))
+
 (comment
+  (reload)
   (component-repl/reset)
   (-> (config/read-config) :server :port))
 
