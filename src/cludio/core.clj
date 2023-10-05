@@ -102,6 +102,9 @@
   []
   (let [system (-> (config/read-config) (api-system) (component/start-system))]
    (println "Starting Cludio with system" system) 
+   (.addShutdownHook
+     (Runtime/getRuntime)
+     (new Thread #(component/stop-system system)))
     ))
 
 (comment (-main) (stop-dev) (restart))
