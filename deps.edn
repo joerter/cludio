@@ -6,7 +6,8 @@
   org.clojure/data.json           {:mvn/version "2.4.0"}
   aero/aero                       {:mvn/version "1.1.6"}
   com.stuartsierra/component      {:mvn/version "1.1.0"}
-  com.stuartsierra/component.repl {:mvn/version "0.2.0"}}
+  com.stuartsierra/component.repl {:mvn/version "0.2.0"}
+  clj-http/clj-http               {:mvn/version "3.12.3"}}
  :paths ["src", "resources", "dev"]
  :aliases
  {:test {:extra-paths ["test"]

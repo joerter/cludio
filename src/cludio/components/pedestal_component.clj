@@ -3,13 +3,27 @@
             [io.pedestal.http.route :as route]
             [io.pedestal.http :as http]))
 
+(defn response [status body]
+  {:status status
+   :body body
+   :headers nil})
+
+(def ok (partial response 200))
+
 (defn echo [request]
   {:status 200
-   :body "John is cool"})
+   :body "Hello world"})
+
+(def get-todo-handler {:name :get-todo-handler :enter
+                       (fn [context]
+                         (let [request (:request context)
+                               response (ok context)]
+                           (assoc context :response response)))})
 
 (def routes
   (route/expand-routes                                   
-   #{["/greet" :get [echo] :route-name :greet]}))
+   #{["/greet" :get [echo] :route-name :greet]
+     ["/todo/:list-id" :get get-todo-handler :route-name :get-todo]}))
 
 (defrecord PedestalComponent [config example-component]
   component/Lifecycle
