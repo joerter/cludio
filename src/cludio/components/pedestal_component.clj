@@ -1,7 +1,8 @@
 (ns cludio.components.pedestal-component
   (:require [com.stuartsierra.component :as component]
             [io.pedestal.http.route :as route]
-            [io.pedestal.http :as http]))
+            [io.pedestal.http :as http]
+            [cludio.components.in-memory-state-component :as in-memory-state-component]))
 
 (defn response [status body]
   {:status status
@@ -25,7 +26,10 @@
    #{["/greet" :get [echo] :route-name :greet]
      ["/todo/:list-id" :get get-todo-handler :route-name :get-todo]}))
 
-(defrecord PedestalComponent [config example-component]
+(defrecord PedestalComponent 
+  [config 
+   example-component 
+   in-memory-state-component]
   component/Lifecycle
 
   (start [component]
