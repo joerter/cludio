@@ -37,6 +37,8 @@
    #{["/greet" :get [echo] :route-name :greet]
      ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]}))
 
+(def url-for (route/url-for-routes routes))
+
 (defn inject-dependencies [dependencies]
   (interceptor/interceptor
     {:name ::inject-dependencies

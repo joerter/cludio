@@ -1,9 +1,11 @@
 (ns component.api.api-test
   (:require
    [clj-http.client :as client]
+   [clojure.string :as str]
+   [clojure.test :refer :all]
+   [cludio.components.pedestal-component :refer [url-for]]
    [cludio.core :as core]
-   [com.stuartsierra.component :as component]
-   [clojure.test :refer :all]))
+   [com.stuartsierra.component :as component]))
 
 (defmacro with-system
   [[bound-var binding-expr] & body]
@@ -13,11 +15,17 @@
        (finally
          (component/stop ~bound-var)))))
 
+(defn sut->url
+  [sut path]
+  (str/join ["http://localhost:"
+            (-> sut :pedestal-component :config :server :port)
+            path]))
+
 (deftest greeting-test
   (with-system 
     [sut (core/api-system {:server {:port 9000}})]
       (is (= {:body "Hello world" :status 200} 
-             (-> (str "http://localhost:" 9000 "/greet")
+             (-> (sut->url sut (url-for :greet))
                  (client/get)
                  (select-keys [:body :status]))))))
 
@@ -31,13 +39,14 @@
         (reset! (-> sut :in-memory-state-component :state-atom)
                 [todo-1])
         (let [expected {:body (pr-str todo-1) :status 200}
-              actual (-> (str "http://localhost:" 9000 "/todo/" todo-id-1)
+              actual (-> (sut->url sut (url-for :get-todo {:path-params {:todo-id todo-id-1}}))
                        (client/get)
                        (select-keys [:body :status]))] 
           (is (= expected actual)))
         (testing "Empty body is returned for not found todo id"
           (let [expected {:body "" :status 200}
-                actual (-> (str "http://localhost:" 9000 "/todo/" (random-uuid))
+                actual (-> (sut->url sut (url-for :get-todo
+                                          {:path-params {:todo-id (random-uuid)}}))
                        (client/get)
                        (select-keys [:body :status]))]
             (is (= expected actual)))))))
