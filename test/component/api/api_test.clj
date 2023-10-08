@@ -15,6 +15,10 @@
        (finally
          (component/stop ~bound-var)))))
 
+(defn get-free-port []
+  (with-open [socket (ServerSocket. 0)]
+    (.getLocalPort socket)))
+
 (defn sut->url
   [sut path]
   (str/join ["http://localhost:"
@@ -23,7 +27,7 @@
 
 (deftest greeting-test
   (with-system 
-    [sut (core/api-system {:server {:port 9000}})]
+    [sut (core/api-system {:server {:port (get-free-port)}})]
       (is (= {:body "Hello world" :status 200} 
              (-> (sut->url sut (url-for :greet))
                  (client/get)
@@ -35,7 +39,7 @@
                 :name "My todo for test"
                 :items [{:id (random-uuid) :name "finish the test"}]}] 
     (with-system 
-      [sut (core/api-system {:server {:port 9000}})]
+      [sut (core/api-system {:server {:port (get-free-port)}})]
         (reset! (-> sut :in-memory-state-component :state-atom)
                 [todo-1])
         (let [expected {:body (pr-str todo-1) :status 200}
