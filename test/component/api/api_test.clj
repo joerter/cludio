@@ -23,49 +23,49 @@
 (defn sut->url
   [sut path]
   (str/join ["http://localhost:"
-            (-> sut :pedestal-component :config :server :port)
-            path]))
+             (-> sut :pedestal-component :config :server :port)
+             path]))
 
 (deftest greeting-test
-  (with-system 
+  (with-system
     [sut (core/api-system {:server {:port (get-free-port)}})]
-      (is (= {:body "Hello world" :status 200} 
-             (-> (sut->url sut (url-for :greet))
-                 (client/get)
-                 (select-keys [:body :status]))))))
+    (is (= {:body "Hello world" :status 200}
+           (-> (sut->url sut (url-for :greet))
+               (client/get)
+               (select-keys [:body :status]))))))
 
 (deftest get-todo-test
   (let [todo-id-1 (str (random-uuid))
         todo-1 {:id todo-id-1
                 :name "My todo for test"
-                :items [{:id (str (random-uuid)) :name "finish the test"}]}] 
-    (with-system 
+                :items [{:id (str (random-uuid)) :name "finish the test"}]}]
+    (with-system
       [sut (core/api-system {:server {:port (get-free-port)}})]
-        (reset! (-> sut :in-memory-state-component :state-atom)
-                [todo-1])
-        (let [expected {:body todo-1 :status 200}
-              actual (-> (sut->url sut (url-for :get-todo {:path-params {:todo-id todo-id-1}}))
+      (reset! (-> sut :in-memory-state-component :state-atom)
+              [todo-1])
+      (let [expected {:body todo-1 :status 200}
+            actual (-> (sut->url sut (url-for :get-todo {:path-params {:todo-id todo-id-1}}))
                        (client/get {:accept :json
                                     :as :json
                                     :throw-exceptions false})
-                       (select-keys [:body :status]))] 
-          (is (= expected actual)))
-        (testing "Empty body is returned for not found todo id"
-          (let [expected {:body "" :status 404}
-                actual (-> (sut->url sut (url-for :get-todo
-                                          {:path-params {:todo-id (random-uuid)}}))
-                       (client/get {:throw-exceptions false})
                        (select-keys [:body :status]))]
-            (is (= expected actual)))))))
+        (is (= expected actual)))
+      (testing "Empty body is returned for not found todo id"
+        (let [expected {:body "" :status 404}
+              actual (-> (sut->url sut (url-for :get-todo
+                                                {:path-params {:todo-id (random-uuid)}}))
+                         (client/get {:throw-exceptions false})
+                         (select-keys [:body :status]))]
+          (is (= expected actual)))))))
 
 (deftest simple-test
   (is (= 1 1)))
 
 (run-tests)
 
-(comment 
+(comment
   (-> (str "http://localhost:8080/todo/9")
-                   (client/get)
-                   (select-keys [:body :status]))
+      (client/get)
+      (select-keys [:body :status]))
   (-> (str "http://localhost:8080/greet") (client/get) (select-keys [:body :status]))
   (println (get-free-port)))

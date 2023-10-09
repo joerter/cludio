@@ -15,7 +15,7 @@
 (defn new-in-memory-state-component [config]
   (map->InMemoryStateComponent {:config config}))
 
-            
-            
-            
-            
+
+
+
+

@@ -11,11 +11,11 @@
 
 (def content-negotiation-interceptor (content-negotiation/negotiate-content supported-types))
 
-(defn response 
+(defn response
   ([status]
    (response status nil))
   ([status body]
-  (merge 
+   (merge
     {:status status
      :headers {"Content-Type" "application/json"}}
     (when body {:body body}))))
@@ -39,14 +39,14 @@
                          (println "get-todo-handler" (keys context))
                          (let [request (:request context)
                                todo (get-todo-by-id dependencies
-                                (-> request :path-params :todo-id))
-                               response (if todo 
+                                                    (-> request :path-params :todo-id))
+                               response (if todo
                                           (ok (json/encode todo))
                                           (not-found))]
                            (assoc context :response response)))})
 
 (def routes
-  (route/expand-routes                                   
+  (route/expand-routes
    #{["/greet" :get [echo] :route-name :greet]
      ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]}))
 
@@ -54,14 +54,14 @@
 
 (defn inject-dependencies [dependencies]
   (interceptor/interceptor
-    {:name ::inject-dependencies
-     :enter (fn [context]
-              (assoc context :dependencies dependencies))}))
+   {:name ::inject-dependencies
+    :enter (fn [context]
+             (assoc context :dependencies dependencies))}))
 
-(defrecord PedestalComponent 
-  [config 
-   example-component 
-   in-memory-state-component]
+(defrecord PedestalComponent
+           [config
+            example-component
+            in-memory-state-component]
   component/Lifecycle
 
   (start [component]
@@ -70,12 +70,12 @@
                       ::http/type :jetty
                       ::http/join? false
                       ::http/port (-> config :server :port)}
-                    (http/default-interceptors)
-                    (update 
-                      ::http/interceptors concat 
+                     (http/default-interceptors)
+                     (update
+                      ::http/interceptors concat
                       [(inject-dependencies component) content-negotiation-interceptor])
-                    (http/create-server)
-                    (http/start))]
+                     (http/create-server)
+                     (http/start))]
       (assoc component :server server)))
 
   (stop [component]
@@ -87,7 +87,7 @@
 (defn new-pedestal-component [config]
   (map->PedestalComponent {:config config}))
 
-            
-            
-            
-            
+
+
+
+

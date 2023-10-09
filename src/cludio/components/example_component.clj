@@ -15,7 +15,7 @@
 (defn new-example-component [config]
   (map->ExampleComponent {:config config}))
 
-            
-            
-            
-            
+
+
+
+
