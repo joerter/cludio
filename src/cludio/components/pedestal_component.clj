@@ -3,12 +3,18 @@
    [com.stuartsierra.component :as component]
    [io.pedestal.http :as http]
    [io.pedestal.http.route :as route]
-   [io.pedestal.interceptor :as interceptor]))
+   [io.pedestal.interceptor :as interceptor]
+   [io.pedestal.http.content-negotiation :as content-negotiation]
+   [cheshire.core :as json]))
+
+(def supported-types ["application/json"])
+
+(def content-negotiation-interceptor (content-negotiation/negotiate-content supported-types))
 
 (defn response [status body]
   {:status status
    :body body
-   :headers nil})
+   :headers {"Content-Type" "application/json"}})
 
 (def ok (partial response 200))
 
@@ -18,7 +24,6 @@
 
 (defn get-todo-by-id
   [{:keys [in-memory-state-component]} todo-id]
-  (println "Todo id: " todo-id)
   (->> @(:state-atom in-memory-state-component)
        (filter (fn [todo]
                  (= todo-id (:id todo))))
@@ -28,8 +33,9 @@
                        (fn [{:keys [dependencies] :as context}]
                          (println "get-todo-handler" (keys context))
                          (let [request (:request context)
-                               response (ok (get-todo-by-id dependencies
-                                (-> request :path-params :todo-id (parse-uuid))))]
+                               todo (get-todo-by-id dependencies
+                                (-> request :path-params :todo-id (parse-uuid)))
+                               response (ok (json/encode todo))]
                            (assoc context :response response)))})
 
 (def routes
@@ -58,7 +64,9 @@
                       ::http/join? false
                       ::http/port (-> config :server :port)}
                     (http/default-interceptors)
-                    (update ::http/interceptors concat [(inject-dependencies component)])
+                    (update 
+                      ::http/interceptors concat 
+                      [(inject-dependencies component) content-negotiation-interceptor])
                     (http/create-server)
                     (http/start))]
       (assoc component :server server)))

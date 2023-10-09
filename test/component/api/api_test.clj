@@ -5,7 +5,8 @@
    [clojure.test :refer :all]
    [cludio.components.pedestal-component :refer [url-for]]
    [cludio.core :as core]
-   [com.stuartsierra.component :as component]))
+   [com.stuartsierra.component :as component])
+  (:import (java.net ServerSocket)))
 
 (defmacro with-system
   [[bound-var binding-expr] & body]
@@ -64,4 +65,5 @@
   (-> (str "http://localhost:8080/todo/9")
                    (client/get)
                    (select-keys [:body :status]))
-  (-> (str "http://localhost:8080/greet") (client/get) (select-keys [:body :status])))
+  (-> (str "http://localhost:8080/greet") (client/get) (select-keys [:body :status]))
+  (println (get-free-port)))
