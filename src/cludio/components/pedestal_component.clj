@@ -11,12 +11,17 @@
 
 (def content-negotiation-interceptor (content-negotiation/negotiate-content supported-types))
 
-(defn response [status body]
-  {:status status
-   :body body
-   :headers {"Content-Type" "application/json"}})
+(defn response 
+  ([status]
+   (response status nil))
+  ([status body]
+  (merge 
+    {:status status
+     :headers {"Content-Type" "application/json"}}
+    (when body {:body body}))))
 
 (def ok (partial response 200))
+(def not-found (partial response 404))
 
 (defn echo [request]
   {:status 200
@@ -35,7 +40,9 @@
                          (let [request (:request context)
                                todo (get-todo-by-id dependencies
                                 (-> request :path-params :todo-id))
-                               response (ok (json/encode todo))]
+                               response (if todo 
+                                          (ok (json/encode todo))
+                                          (not-found))]
                            (assoc context :response response)))})
 
 (def routes

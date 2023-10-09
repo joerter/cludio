@@ -51,10 +51,10 @@
                        (select-keys [:body :status]))] 
           (is (= expected actual)))
         (testing "Empty body is returned for not found todo id"
-          (let [expected {:body "" :status 200}
+          (let [expected {:body "" :status 404}
                 actual (-> (sut->url sut (url-for :get-todo
                                           {:path-params {:todo-id (random-uuid)}}))
-                       (client/get)
+                       (client/get {:throw-exceptions false})
                        (select-keys [:body :status]))]
             (is (= expected actual)))))))
 
