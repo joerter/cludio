@@ -34,7 +34,7 @@
                          (println "get-todo-handler" (keys context))
                          (let [request (:request context)
                                todo (get-todo-by-id dependencies
-                                (-> request :path-params :todo-id (parse-uuid)))
+                                (-> request :path-params :todo-id))
                                response (ok (json/encode todo))]
                            (assoc context :response response)))})
 

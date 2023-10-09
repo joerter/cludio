@@ -35,17 +35,19 @@
                  (select-keys [:body :status]))))))
 
 (deftest get-todo-test
-  (let [todo-id-1 (random-uuid)
+  (let [todo-id-1 (str (random-uuid))
         todo-1 {:id todo-id-1
                 :name "My todo for test"
-                :items [{:id (random-uuid) :name "finish the test"}]}] 
+                :items [{:id (str (random-uuid)) :name "finish the test"}]}] 
     (with-system 
       [sut (core/api-system {:server {:port (get-free-port)}})]
         (reset! (-> sut :in-memory-state-component :state-atom)
                 [todo-1])
-        (let [expected {:body (pr-str todo-1) :status 200}
+        (let [expected {:body todo-1 :status 200}
               actual (-> (sut->url sut (url-for :get-todo {:path-params {:todo-id todo-id-1}}))
-                       (client/get)
+                       (client/get {:accept :json
+                                    :as :json
+                                    :throw-exceptions false})
                        (select-keys [:body :status]))] 
           (is (= expected actual)))
         (testing "Empty body is returned for not found todo id"
