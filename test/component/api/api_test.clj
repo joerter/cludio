@@ -40,7 +40,7 @@
   (let [todo-id-1 (str (random-uuid))
         todo-1 {:id todo-id-1
                 :name "My todo for test"
-                :items [{:id (str (random-uuid)) :name "finish the test"}]}]
+                :items [{:id (str (random-uuid)) :name "finish the test" :status "done"}]}]
     (with-system
       [sut (core/api-system {:server {:port (get-free-port)}})]
       (reset! (-> sut :in-memory-state-component :state-atom)
@@ -64,7 +64,7 @@
   (let [todo-id-1 (str (random-uuid))
         todo-1 {:id todo-id-1
                 :name "My todo for test"
-                :items [{:id (str (random-uuid)) :name "finish the test"}]}]
+                :items [{:id (str (random-uuid)) :name "finish the test" :status "done"}]}]
     (with-system
       [sut (core/api-system {:server {:port (get-free-port)}})]
       (let [expected {:body todo-1 :status 201}
@@ -75,8 +75,7 @@
                                      :throw-exceptions false
                                      :body (json/encode todo-1)})
                        (select-keys [:body :status]))]
-        (is (= expected actual)))
-      )))
+        (is (= expected actual))))))
 
 (run-tests)
 

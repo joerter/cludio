@@ -6,7 +6,22 @@
    [io.pedestal.interceptor :as interceptor]
    [io.pedestal.http.content-negotiation :as content-negotiation]
    [io.pedestal.http.body-params :as body-params]
-   [cheshire.core :as json]))
+   [cheshire.core :as json]
+   [schema.core :as s]))
+
+(s/defschema
+  TodoItem
+  {:id s/Str
+   :name s/Str
+   :status s/Str})
+
+(s/defschema Todo
+  {:id s/Str
+   :name s/Str
+   :items [TodoItem]})
+
+(comment
+  (s/validate Todo {:id "id" :name "some name" :items []}))
 
 (def supported-types ["application/json"])
 
@@ -52,12 +67,12 @@
   (swap! (:state-atom in-memory-state-component) conj todo))
 
 (def post-todo-handler {:name :post-todo-handler :enter
-                       (fn [{:keys [dependencies] :as context}]
-                         (println "post-todo-handler" (keys context))
-                         (let [request (:request context)
-                               todo (:json-params request)]
-                           (save-todo! dependencies todo)
-                           (assoc context :response (created todo))))})
+                        (fn [{:keys [dependencies] :as context}]
+                          (println "post-todo-handler" (keys context))
+                          (let [request (:request context)
+                                todo (s/validate Todo (:json-params request))]
+                            (save-todo! dependencies todo)
+                            (assoc context :response (created todo))))})
 
 (def routes
   (route/expand-routes
