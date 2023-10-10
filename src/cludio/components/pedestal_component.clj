@@ -5,6 +5,7 @@
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor :as interceptor]
    [io.pedestal.http.content-negotiation :as content-negotiation]
+   [io.pedestal.http.body-params :as body-params]
    [cheshire.core :as json]))
 
 (def supported-types ["application/json"])
@@ -18,10 +19,11 @@
    (merge
     {:status status
      :headers {"Content-Type" "application/json"}}
-    (when body {:body body}))))
+    (when body {:body (json/encode body)}))))
 
 (def ok (partial response 200))
 (def not-found (partial response 404))
+(def created (partial response 201))
 
 (defn echo [request]
   {:status 200
@@ -41,14 +43,27 @@
                                todo (get-todo-by-id dependencies
                                                     (-> request :path-params :todo-id))
                                response (if todo
-                                          (ok (json/encode todo))
+                                          (ok todo)
                                           (not-found))]
                            (assoc context :response response)))})
+
+(defn save-todo!
+  [{:keys [in-memory-state-component]} todo]
+  (swap! (:state-atom in-memory-state-component) conj todo))
+
+(def post-todo-handler {:name :post-todo-handler :enter
+                       (fn [{:keys [dependencies] :as context}]
+                         (println "post-todo-handler" (keys context))
+                         (let [request (:request context)
+                               todo (:json-params request)]
+                           (save-todo! dependencies todo)
+                           (assoc context :response (created todo))))})
 
 (def routes
   (route/expand-routes
    #{["/greet" :get [echo] :route-name :greet]
-     ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]}))
+     ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]
+     ["/todo" :post [(body-params/body-params) post-todo-handler] :route-name :post-todo]}))
 
 (def url-for (route/url-for-routes routes))
 

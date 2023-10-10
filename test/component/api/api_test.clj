@@ -1,12 +1,14 @@
 (ns component.api.api-test
   (:require
+   [cheshire.core :as json]
    [clj-http.client :as client]
    [clojure.string :as str]
    [clojure.test :refer :all]
    [cludio.components.pedestal-component :refer [url-for]]
    [cludio.core :as core]
    [com.stuartsierra.component :as component])
-  (:import (java.net ServerSocket)))
+  (:import
+   (java.net ServerSocket)))
 
 (defmacro with-system
   [[bound-var binding-expr] & body]
@@ -58,8 +60,23 @@
                          (select-keys [:body :status]))]
           (is (= expected actual)))))))
 
-(deftest simple-test
-  (is (= 1 1)))
+(deftest post-todo-test
+  (let [todo-id-1 (str (random-uuid))
+        todo-1 {:id todo-id-1
+                :name "My todo for test"
+                :items [{:id (str (random-uuid)) :name "finish the test"}]}]
+    (with-system
+      [sut (core/api-system {:server {:port (get-free-port)}})]
+      (let [expected {:body todo-1 :status 201}
+            actual (-> (sut->url sut (url-for :post-todo))
+                       (client/post {:accept :json
+                                     :content-type :json
+                                     :as :json
+                                     :throw-exceptions false
+                                     :body (json/encode todo-1)})
+                       (select-keys [:body :status]))]
+        (is (= expected actual)))
+      )))
 
 (run-tests)
 
