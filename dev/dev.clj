@@ -6,7 +6,10 @@
 
 (component-repl/set-init
   (fn [old-system]
-    (let [port (-> (config/read-config) :server :port)] (core/api-system {:server {:port port}}))))
+    (let [port (-> (config/read-config) :server :port)] 
+      (core/api-system {:server {:port port} :db-spec {:jdbcUrl "jdbc:postgresql://localhost:5432/cludio"
+                                                       :username "cludio"
+                                                       :password "cludio"}}))))
 
 (defn reload []
   (component-repl/reset))
