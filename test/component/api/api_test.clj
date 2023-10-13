@@ -77,7 +77,7 @@
                        (select-keys [:body :status]))]
         (is (= expected actual))))))
 
-(run-tests)
+(comment (run-tests))
 
 (comment
   (-> (str "http://localhost:8080/todo/9")

@@ -76,11 +76,11 @@
                             (assoc context :response (created todo))))})
 
 (def info-handler {:name :info-handler :enter
-                       (fn [{:keys [dependencies] :as context}]
-                         (let [{:keys [data-source]} dependencies
-                               db-response (first (jdbc/execute! (data-source) ["SHOW SERVER_VERSION"]))]
-                           (clojure.pprint/pprint db-response)
-                           (assoc context :response {:status 200 :body (str "Database server version" db-response)})))})
+                   (fn [{:keys [dependencies] :as context}]
+                     (let [{:keys [data-source]} dependencies
+                           db-response (first (jdbc/execute! (data-source) ["SHOW SERVER_VERSION"]))]
+                       (clojure.pprint/pprint db-response)
+                       (assoc context :response {:status 200 :body (str "Database server version" db-response)})))})
 
 (def routes
   (route/expand-routes
