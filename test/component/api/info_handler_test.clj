@@ -40,14 +40,13 @@
                                :db-spec {:jdbcUrl (.getJdbcUrl database-container)
                                          :username (.getUsername database-container)
                                          :password (.getPassword database-container)}})]
-       (let [expected {:body "Database server version{:server_version \"15.4 (Debian 15.4-2.pgdg120+1)\"}" :status 200}
-            actual (-> (sut->url sut (url-for :info))
-                       (client/get {:throw-exceptions false})
-                       (select-keys [:body :status]))]
-        (is (= expected actual))))
+        (let [expected {:body "Database server version{:server_version \"15.4 (Debian 15.4-2.pgdg120+1)\"}" :status 200}
+              actual (-> (sut->url sut (url-for :info))
+                         (client/get {:throw-exceptions false})
+                         (select-keys [:body :status]))]
+          (is (= expected actual))))
       (finally
         (.stop database-container)))))
-
 
 (comment (run-tests))
 

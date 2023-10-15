@@ -40,9 +40,9 @@
         (is (= "" (-> (sut->url sut (url-for :info)))))
         (is (= "" (.getJdbcUrl database-container)))
         (let [ds (jdbc/get-datasource {:jdbcUrl (.getJdbcUrl database-container)
-                                     :user (.getUsername database-container)
-                                     :password (.getPassword database-container)})]
-        (is (= {:r 1} (first (jdbc/execute! ds ["select 1 as r;"]))))))
+                                       :user (.getUsername database-container)
+                                       :password (.getPassword database-container)})]
+          (is (= {:r 1} (first (jdbc/execute! ds ["select 1 as r;"]))))))
       (finally
         (.stop database-container)))))
 

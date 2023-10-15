@@ -18,7 +18,8 @@
   org.postgresql/postgresql {:mvn/version "42.2.10"}
   com.zaxxer/HikariCP {:mvn/version "5.0.1"}
   hiccup/hiccup {:mvn/version "2.0.0-RC1"}
-  faker/faker {:mvn/version "0.3.2"}}
+  faker/faker {:mvn/version "0.3.2"}
+  org.flywaydb/flyway-core {:mvn/version "9.22.3"}}
  :paths ["src", "resources", "dev"]
  :aliases
  {:test {:extra-paths ["test"]
