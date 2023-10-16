@@ -48,4 +48,39 @@
       (finally
         (.stop database-container)))))
 
+(deftest todo-table-test
+  (let [database-container (create-database-container)]
+    (try
+      (.start database-container)
+      (with-system
+        [sut (datasource-only-system
+               {:db-spec {:jdbcUrl (.getJdbcUrl database-container)
+                          :username (.getUsername database-container)
+                          :password (.getPassword database-container)}})]
+        (let [{:keys [datasource]} sut
+              insert-results (jdbc/execute!
+                               (datasource)
+                               ["
+insert into todo (title)
+values ('my todo list'),
+       ('other todo list')
+returning *
+"
+                                ]
+                               {:builder-fn rs/as-unqualified-lower-maps})
+              select-results (jdbc/execute!
+                               (datasource)
+                               ["
+select * from todo"]
+                               {:builder-fn rs/as-unqualified-lower-maps})]
+          (is (= 2
+                 (count insert-results)
+                 (count select-results)))
+          (is (= #{"my todo list"
+                   "other todo list"}
+                 (->> insert-results (map :title) (into #{}))
+                 (->> select-results (map :title) (into #{}))))))
+      (finally
+        (.stop database-container)))))
+
 (comment (run-tests))
