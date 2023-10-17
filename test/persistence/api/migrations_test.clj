@@ -31,15 +31,15 @@
       (.start database-container)
       (with-system
         [sut (datasource-only-system
-               {:db-spec {:jdbcUrl (.getJdbcUrl database-container)
-                          :username (.getUsername database-container)
-                          :password (.getPassword database-container)}})]
+              {:db-spec {:jdbcUrl (.getJdbcUrl database-container)
+                         :username (.getUsername database-container)
+                         :password (.getPassword database-container)}})]
         (let [{:keys [datasource]} sut
               [schema-version :as schema-versions]
               (jdbc/execute!
-                (datasource)
-                ["select * from schema_version"]
-                {:builder-fn rs/as-unqualified-lower-maps})]
+               (datasource)
+               ["select * from schema_version"]
+               {:builder-fn rs/as-unqualified-lower-maps})]
           (is (= 1 (count schema-versions)))
           (is (= {:description "add todo tables"
                   :script "V1__add_todo_tables.sql"
@@ -54,25 +54,24 @@
       (.start database-container)
       (with-system
         [sut (datasource-only-system
-               {:db-spec {:jdbcUrl (.getJdbcUrl database-container)
-                          :username (.getUsername database-container)
-                          :password (.getPassword database-container)}})]
+              {:db-spec {:jdbcUrl (.getJdbcUrl database-container)
+                         :username (.getUsername database-container)
+                         :password (.getPassword database-container)}})]
         (let [{:keys [datasource]} sut
               insert-results (jdbc/execute!
-                               (datasource)
-                               ["
+                              (datasource)
+                              ["
 insert into todo (title)
 values ('my todo list'),
        ('other todo list')
 returning *
-"
-                                ]
-                               {:builder-fn rs/as-unqualified-lower-maps})
+"]
+                              {:builder-fn rs/as-unqualified-lower-maps})
               select-results (jdbc/execute!
-                               (datasource)
-                               ["
+                              (datasource)
+                              ["
 select * from todo"]
-                               {:builder-fn rs/as-unqualified-lower-maps})]
+                              {:builder-fn rs/as-unqualified-lower-maps})]
           (is (= 2
                  (count insert-results)
                  (count select-results)))
