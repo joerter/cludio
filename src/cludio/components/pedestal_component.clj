@@ -2,6 +2,7 @@
   (:require
    [cheshire.core :as json]
    [com.stuartsierra.component :as component]
+   [honey.sql :as sql]
    [io.pedestal.http :as http]
    [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.content-negotiation :as content-negotiation]
@@ -63,6 +64,21 @@
                                           (not-found))]
                            (assoc context :response response)))})
 
+(def db-get-todo-handler {:name :get-todo-handler :enter
+                          (fn [{:keys [dependencies] :as context}]
+                            (let [{:keys [data-source]} dependencies
+                                  todo-id (-> context :request :path-params :todo-id (parse-uuid))
+                                  todo (jdbc/execute-one!
+                                        (data-source)
+                                        (-> {:select *
+                                             :from :todo
+                                             :where [:= :todo-id todo-id]}
+                                            (sql/format)))
+                                  response (if todo
+                                             (ok todo)
+                                             (not-found))]
+                              (assoc context :response response)))})
+
 (defn save-todo!
   [{:keys [in-memory-state-component]} todo]
   (swap! (:state-atom in-memory-state-component) conj todo))
@@ -87,6 +103,7 @@
    #{["/greet" :get [echo] :route-name :greet]
      ["/info" :get info-handler :route-name :info]
      ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]
+     ["/db/todo/:todo-id" :get db-get-todo-handler :route-name :db-get-todo]
      ["/todo" :post [(body-params/body-params) post-todo-handler] :route-name :post-todo]}))
 
 (def url-for (route/url-for-routes routes))
