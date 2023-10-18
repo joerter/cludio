@@ -44,25 +44,26 @@
         (let [{:keys [data-source]} sut
               {:keys [todo-id
                       title]} (jdbc/execute-one! (data-source) (-> {:insert-into [:todo]
-                                                    :columns [:title]
-                                                    :values [["My todo for test"]]
-                                                    :returning :*}
-                                                   (sql/format))
-                                  {:builder-fn rs/as-unqualified-kebab-maps})
-              expected {:body todo-id :status 200}
-              actual (-> (sut->url sut (url-for :db-get-todo {:path-params {:todo-id todo-id}}))
-                         (client/get {:accept :json
-                                      :as :json
-                                      :throw-exceptions false})
-                         (select-keys [:body :status]))]
-          (is (= expected actual)))
+                                                                    :columns [:title]
+                                                                    :values [["My todo for test"]]
+                                                                    :returning :*}
+                                                                   (sql/format))
+                                                 {:builder-fn rs/as-unqualified-kebab-maps})
+              {:keys [status body]} (-> (sut->url sut (url-for :db-get-todo {:path-params {:todo-id todo-id}}))
+                                        (client/get {:accept :json
+                                                     :as :json
+                                                     :throw-exceptions false})
+                                        (select-keys [:body :status]))]
+          (is (= 200 status))
+          (is (some? (:created-at body)))
+          (is (= {:todo-id (str todo-id) :title title} (select-keys body [:todo-id :title]))))
         (comment (testing "Empty body is returned for not found todo id"
-          (let [expected {:body "" :status 404}
-                actual (-> (sut->url sut (url-for :get-todo
-                                                  {:path-params {:todo-id (random-uuid)}}))
-                           (client/get {:throw-exceptions false})
-                           (select-keys [:body :status]))]
-            (is (= expected actual))))))
+                   (let [expected {:body "" :status 404}
+                         actual (-> (sut->url sut (url-for :get-todo
+                                                           {:path-params {:todo-id (random-uuid)}}))
+                                    (client/get {:throw-exceptions false})
+                                    (select-keys [:body :status]))]
+                     (is (= expected actual))))))
       (finally
         (.stop database-container)))))
 

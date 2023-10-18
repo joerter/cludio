@@ -9,7 +9,8 @@
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor :as interceptor]
    [next.jdbc :as jdbc]
-   [schema.core :as s]))
+   [schema.core :as s]
+   [next.jdbc.result-set :as rs]))
 
 (s/defschema
   TodoItem
@@ -64,16 +65,18 @@
                                           (not-found))]
                            (assoc context :response response)))})
 
-(def db-get-todo-handler {:name :get-todo-handler :enter
+(def db-get-todo-handler {:name :db-get-todo-handler :enter
                           (fn [{:keys [dependencies] :as context}]
+                            (println "db-get-todo-handler")
                             (let [{:keys [data-source]} dependencies
                                   todo-id (-> context :request :path-params :todo-id (parse-uuid))
+                                  todo-by-id-query (sql/format {:select :*
+                                                                :from :todo
+                                                                :where [:= :todo-id todo-id]})
                                   todo (jdbc/execute-one!
                                         (data-source)
-                                        (-> {:select *
-                                             :from :todo
-                                             :where [:= :todo-id todo-id]}
-                                            (sql/format)))
+                                        todo-by-id-query
+                                        {:builder-fn rs/as-unqualified-kebab-maps})
                                   response (if todo
                                              (ok todo)
                                              (not-found))]
