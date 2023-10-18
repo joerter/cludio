@@ -103,14 +103,19 @@
                        (clojure.pprint/pprint db-response)
                        (assoc context :response {:status 200 :body (str "Database server version" db-response)})))})
 
+(defn html-ok
+  [body]
+  {:status 200
+   :headers {"Content-Type" "text/html"}
+   :body (-> body
+             (h/html)
+             (str))})
+
 (defn index-handler
   [request]
-  (let [html (h/html (hp/html5
-                      [:head
-                       [:title "Cludio"]]
-                      [:body
-                       [:h1 "Welcome to Cludio!"]]))]
-    {:status 200 :body html :headers {"Content-Type" "text/html"}}))
+  (let [body [:html [:head [:title "Cludio"]]
+              [:body [:h1 "Hello world!"]]]]
+    (html-ok body)))
 
 (def routes
   (route/expand-routes
