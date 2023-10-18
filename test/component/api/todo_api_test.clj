@@ -57,13 +57,13 @@
           (is (= 200 status))
           (is (some? (:created-at body)))
           (is (= {:todo-id (str todo-id) :title title} (select-keys body [:todo-id :title]))))
-        (comment (testing "Empty body is returned for not found todo id"
+        (testing "Empty body is returned for not found todo id"
                    (let [expected {:body "" :status 404}
-                         actual (-> (sut->url sut (url-for :get-todo
+                         actual (-> (sut->url sut (url-for :db-get-todo
                                                            {:path-params {:todo-id (random-uuid)}}))
                                     (client/get {:throw-exceptions false})
                                     (select-keys [:body :status]))]
-                     (is (= expected actual))))))
+                     (is (= expected actual)))))
       (finally
         (.stop database-container)))))
 
