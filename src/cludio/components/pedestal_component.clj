@@ -10,7 +10,9 @@
    [io.pedestal.interceptor :as interceptor]
    [next.jdbc :as jdbc]
    [schema.core :as s]
-   [next.jdbc.result-set :as rs]))
+   [next.jdbc.result-set :as rs]
+   [hiccup2.core :as h]
+   [hiccup.page :as hp]))
 
 (s/defschema
   TodoItem
@@ -101,11 +103,21 @@
                        (clojure.pprint/pprint db-response)
                        (assoc context :response {:status 200 :body (str "Database server version" db-response)})))})
 
+(defn index-handler
+  [request]
+  (let [html (h/html (hp/html5
+                      [:head
+                       [:title "Cludio"]]
+                      [:body
+                       [:h1 "Welcome to Cludio!"]]))]
+    {:status 200 :body html :headers {"Content-Type" "text/html"}}))
+
 (def routes
   (route/expand-routes
    #{["/greet" :get [echo] :route-name :greet]
      ["/info" :get info-handler :route-name :info]
      ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]
+     ["/" :get [index-handler] :route-name :index-page]
      ["/db/todo/:todo-id" :get db-get-todo-handler :route-name :db-get-todo]
      ["/todo" :post [(body-params/body-params) post-todo-handler] :route-name :post-todo]}))
 
