@@ -117,7 +117,7 @@
                      [:title "Cludio"]
                      [:meta {:charset "UTF-8"}]
                      [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-                     [:link {:href "/public/dist/output.css" :rel "stylesheet"}]]
+                     [:link {:href "/dist/output.css" :rel "stylesheet"}]]
               [:body [:h1 "Hello world!"]]]]
     (html-ok body)))
 
@@ -150,6 +150,7 @@
     (let [server (-> {::http/routes routes
                       ::http/type :jetty
                       ::http/join? false
+                      ::http/resource-path "/public"
                       ::http/port (-> config :server :port)}
                      (http/default-interceptors)
                      (update
