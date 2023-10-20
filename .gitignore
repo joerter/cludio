@@ -2,3 +2,6 @@
 .cpcache/
 .lsp/
 .nrepl-port
+node_modules/
+dist/
+.DS_Store

@@ -113,7 +113,11 @@
 
 (defn index-handler
   [request]
-  (let [body [:html [:head [:title "Cludio"]]
+  (let [body [:html [:head 
+                     [:title "Cludio"]
+                     [:meta {:charset "UTF-8"}]
+                     [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
+                     [:link {:href "/public/dist/output.css" :rel "stylesheet"}]]
               [:body [:h1 "Hello world!"]]]]
     (html-ok body)))
 
