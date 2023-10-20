@@ -1,5 +1,6 @@
 (ns cludio.components.pedestal-component
   (:require
+   [cludio.ui.app-shell :as app-shell]
    [cheshire.core :as json]
    [com.stuartsierra.component :as component]
    [honey.sql :as sql]
@@ -113,12 +114,12 @@
 
 (defn index-handler
   [request]
-  (let [body [:html [:head 
-                     [:title "Cludio"]
-                     [:meta {:charset "UTF-8"}]
-                     [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-                     [:link {:href "/dist/output.css" :rel "stylesheet"}]]
-              [:body [:h1 "Hello world!"]]]]
+  (let [body [:html {:class "h-full bg-white"} [:head
+                                                [:title "Cludio"]
+                                                [:meta {:charset "UTF-8"}]
+                                                [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
+                                                [:link {:href "/dist/output.css" :rel "stylesheet"}]]
+              [:body {:class "h-full"} app-shell/header app-shell/content]]]
     (html-ok body)))
 
 (def routes
