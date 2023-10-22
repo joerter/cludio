@@ -70,13 +70,13 @@
           :src "https://tailwindui.com/img/logos/mark.svg?color=white"
           :alt "Your Company"}]])
 
-(defn sidebar
+(defn- sidebar
   [sections studios]
   [:div {:class "flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4"}
    (sidebar-brand)
    (sidebar-nav sections studios)])
 
-(defn desktop-sidebar
+(defn- desktop-sidebar
   [sections studios]
   [:div {:class "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"}
    (sidebar sections studios)])
