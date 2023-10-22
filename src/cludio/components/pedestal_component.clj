@@ -1,6 +1,7 @@
 (ns cludio.components.pedestal-component
   (:require
    [cludio.ui.app-shell :as app-shell]
+   [cludio.ui.icons :as icons]
    [cheshire.core :as json]
    [com.stuartsierra.component :as component]
    [honey.sql :as sql]
@@ -112,6 +113,18 @@
              (h/html)
              (str))})
 
+(def sections
+  [{:name "Dashboard" :link "#" :icon icons/home :isActive true}
+    {:name "Calendar" :link "#" :icon icons/calendar :isActive false}
+    {:name "Classes" :link "#" :icon icons/academic-cap :isActive false} ])
+
+(comment (println sections)
+         (println {:name "Dashoard" :icon icons/home})
+         )
+
+(def studios
+  '({:name "NEBT School" :link "#" :isActive true}))
+
 (defn index-handler
   [request]
   (let [body [:html {:class "h-full bg-white"} [:head
@@ -119,7 +132,7 @@
                                                 [:meta {:charset "UTF-8"}]
                                                 [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
                                                 [:link {:href "/dist/output.css" :rel "stylesheet"}]]
-              [:body {:class "h-full"} (app-shell/sidebar '("Dashboard" "Classes" "Students")) app-shell/content]]]
+              [:body {:class "h-full"} (app-shell/sidebar sections studios) app-shell/content]]]
     (html-ok body)))
 
 (def routes
