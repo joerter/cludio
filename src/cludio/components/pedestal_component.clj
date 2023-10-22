@@ -115,12 +115,11 @@
 
 (def sections
   [{:name "Dashboard" :link "#" :icon icons/home :isActive true}
-    {:name "Calendar" :link "#" :icon icons/calendar :isActive false}
-    {:name "Classes" :link "#" :icon icons/academic-cap :isActive false} ])
+   {:name "Calendar" :link "#" :icon icons/calendar :isActive false}
+   {:name "Classes" :link "#" :icon icons/academic-cap :isActive false}])
 
 (comment (println sections)
-         (println {:name "Dashoard" :icon icons/home})
-         )
+         (println {:name "Dashoard" :icon icons/home}))
 
 (def studios
   '({:name "NEBT School" :link "#" :isActive true}))
