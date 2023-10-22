@@ -1,4 +1,6 @@
-(ns cludio.ui.app-shell)
+(ns cludio.ui.app-shell
+  (:require
+   [cludio.ui.icons :as icons]))
 
 (defn- app-section
   [{:keys [name link icon isActive]}]
@@ -30,9 +32,9 @@
     (into [:ul {:role "list" :class "-mx-2 mt-2 space-y-1"}] (map app-studio studios))]])
 
 (defn- app-sections
-  [links]
+  [sections]
   [:li
-   (into [:ul {:role "list" :class "-mx-2 space-y-1"}] (map app-section links))])
+   (into [:ul {:role "list" :class "-mx-2 space-y-1"}] (map app-section sections))])
 
 (defn- app-settings
   []
@@ -54,10 +56,10 @@
     "Settings"]])
 
 (defn- sidebar-nav
-  [links studios]
+  [sections studios]
   [:nav {:class "flex flex-1 flex-col"}
    [:ul {:role "list" :class "flex flex-1 flex-col gap-y-7"}
-    (app-sections links)
+    (app-sections sections)
     (app-studios studios)
     (app-settings)]])
 
@@ -69,14 +71,32 @@
           :alt "Your Company"}]])
 
 (defn sidebar
-  [links studios]
+  [sections studios]
   [:div {:class "flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4"}
    (sidebar-brand)
-   (sidebar-nav links studios)])
+   (sidebar-nav sections studios)])
 
-(comment
-  (sidebar '("Dashboard" "Team" "Projects") '("NEBT School")))
+(defn desktop-sidebar
+  [sections studios]
+  [:div {:class "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"}
+   (sidebar sections studios)])
 
 (def content
   [:main {:class "py-10"}
    [:div {:class "px-4 sm:px-6 lg:px-8"}]])
+
+(def sections
+  [{:name "Dashboard" :link "#" :icon icons/home :isActive true}
+   {:name "Calendar" :link "#" :icon icons/calendar :isActive false}
+   {:name "Classes" :link "#" :icon icons/academic-cap :isActive false}])
+
+(def studios
+  [{:name "NEBT School" :link "#" :isActive false}])
+
+(defn render
+  []
+  [:div
+   (desktop-sidebar sections studios)
+   content])
+
+(comment (render))
