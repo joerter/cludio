@@ -102,13 +102,13 @@
 (def separator
   [:div {:class "h-6 w-px bg-gray-900/10 lg:hidden" :aria-hidden "true"}])
 
-(def ^:private profile-dropdown-menu
-  [:div {:class "absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none transform opacity-0"
+(defn- profile-dropdown-menu [id]
+  [:div {:class "absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none transform hidden"
          :role "menu"
          :aria-orientation "vertical"
          :aria-labelledby "user-menu-button"
          :tabindex "-1"
-         :id "profile-dropdown-menu"}
+         :id id}
    [:a {:href "#"
         :class "block px-3 py-1 text-sm leading-6 text-gray-900"
         :role "menuitem"
@@ -121,15 +121,18 @@
         :id "user-menu-item-1"} "Sign out"]])
 
 (def ^:private profile-dropdown
-  (let [showClass "opacity-100"
-        hideClass "opacity-0"]
+  (let [showClass "block"
+        showingClass "opacity-100"
+        hidingClass "opacity-0"
+        hideClass "hidden"
+        dropdown-menu-id "profile-dropdown-menu"]
     [:div {:class "relative"}
      [:button {:type "button"
                :class "-m-1.5 flex items-center p-1.5"
                :id "user-menu-button"
                :aria-expanded "false"
                :aria-haspopup "true"
-               :_ (str "on click toggle between ." showClass " and ." hideClass " on #profile-dropdown-menu")}
+               :_ (str "on click toggle between ." showClass " and ." hideClass " on #" dropdown-menu-id)}
       [:span {:class "sr-only"} "Open user menu"]
       [:img {:class "h-8 w-8 rounded-full bg-gray-50"
              :src "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -137,8 +140,8 @@
       [:span {:class "hidden lg:flex lg:items-center"}
        [:span {:class "ml-4 text-sm font-semibold leading-6 text-gray-900"
                :aria-hidden "true"} "Tom Cook"]
-       icons/chevron-down]
-      profile-dropdown-menu]]))
+       icons/chevron-down]]
+     (profile-dropdown-menu dropdown-menu-id)]))
 
 (def header
   [:div {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6"}
