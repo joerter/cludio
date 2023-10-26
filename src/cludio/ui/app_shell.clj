@@ -108,7 +108,8 @@
          :aria-orientation "vertical"
          :aria-labelledby "user-menu-button"
          :tabindex "-1"
-         :x-show="open"}
+         :x-show "open"
+         :x-transition ""}
    [:a {:href "#"
         :class "block px-3 py-1 text-sm leading-6 text-gray-900"
         :role "menuitem"

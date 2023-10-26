@@ -121,7 +121,7 @@
                                                 [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
                                                 [:link {:href "/dist/output.css" :rel "stylesheet"}]]
               [:body {:class "h-full"} (app-shell/render)
-               (p/include-js "/dist/htmx.min.js" "/dist/_hyperscript.min.js")]]]
+               (p/include-js "/dist/htmx.min.js" "/dist/_hyperscript.min.js" "/dist/cdn.js")]]]
     (html-ok body)))
 
 (def routes
@@ -155,7 +155,7 @@
                       ::http/join? false
                       ::http/resource-path "/public"
                       ::http/port (-> config :server :port)
-                      ::http/secure-headers {:content-security-policy-settings "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'"}}
+                      ::http/secure-headers {:content-security-policy-settings "default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'"}}
                      (http/default-interceptors)
                      (update
                       ::http/interceptors concat
