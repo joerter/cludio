@@ -81,9 +81,10 @@
   [:div {:class "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"}
    (sidebar sections studios)])
 
-(def content
+(defn content [app-content]
   [:main {:class "py-10"}
-   [:div {:class "px-4 sm:px-6 lg:px-8"}]])
+   [:div {:class "px-4 sm:px-6 lg:px-8"}
+    app-content]])
 
 (def open-sidebar
   [:button {:type "button"
@@ -161,13 +162,13 @@
     [:div {:class "hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"}]
     profile-dropdown]])
 
-(def right-side
+(defn right-side [app-content]
   [:div {:class "lg:pl-72"}
    [:div {:class "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"}
     open-sidebar
     separator
     header]
-   content])
+   (content app-content)])
 
 (def sections
   [{:name "Dashboard" :link "#" :icon icons/home :isActive true}
@@ -178,9 +179,9 @@
   [{:name "NEBT School" :link "#" :isActive false}])
 
 (defn render
-  []
+  [app-content]
   [:div
    (desktop-sidebar sections studios)
-   right-side])
+   (right-side app-content)])
 
 (comment (render))
