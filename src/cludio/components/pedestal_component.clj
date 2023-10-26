@@ -1,6 +1,5 @@
 (ns cludio.components.pedestal-component
   (:require
-   [cludio.ui.app-shell :as app-shell]
    [cheshire.core :as json]
    [com.stuartsierra.component :as component]
    [honey.sql :as sql]
@@ -9,12 +8,11 @@
    [io.pedestal.http.content-negotiation :as content-negotiation]
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor :as interceptor]
-   [io.pedestal.http.secure-headers :as secure-headers]
    [next.jdbc :as jdbc]
    [schema.core :as s]
    [next.jdbc.result-set :as rs]
    [hiccup2.core :as h]
-   [hiccup.page :as p]))
+   [cludio.routes.app.root :as app-root]))
 
 (s/defschema
   TodoItem
@@ -113,25 +111,9 @@
              (h/html)
              (str))})
 
-(defn index-handler
-  [request]
-  (let [body [:html {:class "h-full bg-white"} [:head
-                                                [:title "Cludio"]
-                                                [:meta {:charset "UTF-8"}]
-                                                [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-                                                [:link {:href "/dist/output.css" :rel "stylesheet"}]]
-              [:body {:class "h-full"} (app-shell/render)
-               (p/include-js "/dist/htmx.min.js" "/dist/_hyperscript.min.js" "/dist/cdn.js")]]]
-    (html-ok body)))
-
 (def routes
   (route/expand-routes
-   #{["/greet" :get [echo] :route-name :greet]
-     ["/info" :get info-handler :route-name :info]
-     ["/todo/:todo-id" :get get-todo-handler :route-name :get-todo]
-     ["/" :get [index-handler] :route-name :index-page]
-     ["/db/todo/:todo-id" :get db-get-todo-handler :route-name :db-get-todo]
-     ["/todo" :post [(body-params/body-params) post-todo-handler] :route-name :post-todo]}))
+   #{["/" :get [app-root/handler] :route-name :index-page]}))
 
 (def url-for (route/url-for-routes routes))
 
