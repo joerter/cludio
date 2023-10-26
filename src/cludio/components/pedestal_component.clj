@@ -12,7 +12,8 @@
    [schema.core :as s]
    [next.jdbc.result-set :as rs]
    [hiccup2.core :as h]
-   [cludio.routes.app.root :as app-root]))
+   [cludio.routes.app.dashboard :as app-dashboard]
+   [cludio.routes.app.calendar :as app-calendar]))
 
 (s/defschema
   TodoItem
@@ -113,7 +114,8 @@
 
 (def routes
   (route/expand-routes
-   #{["/" :get [app-root/handler] :route-name :index-page]}))
+   #{["/" :get [app-dashboard/handler] :route-name :index-page ]
+     ["/calendar" :get [app-calendar/handler] :route-name :app-calendar]}))
 
 (def url-for (route/url-for-routes routes))
 

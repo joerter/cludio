@@ -171,9 +171,9 @@
    (content app-content)])
 
 (def sections
-  [{:name "Dashboard" :link "#" :icon icons/home :isActive true}
-   {:name "Calendar" :link "#" :icon icons/calendar :isActive false}
-   {:name "Classes" :link "#" :icon icons/academic-cap :isActive false}])
+  [{:name "Dashboard" :link "/" :icon icons/home :isActive true}
+   {:name "Calendar" :link "/calendar" :icon icons/calendar :isActive false}
+   {:name "Classes" :link "/classes" :icon icons/academic-cap :isActive false}])
 
 (def studios
   [{:name "NEBT School" :link "#" :isActive false}])
@@ -183,5 +183,3 @@
   [:div
    (desktop-sidebar sections studios)
    (right-side app-content)])
-
-(comment (render))
