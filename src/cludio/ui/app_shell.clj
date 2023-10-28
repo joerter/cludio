@@ -67,7 +67,7 @@
   []
   [:div {:class "flex h-16 shrink-0 items-center"}
    [:img {:class "h-8 w-auto"
-          :src "https://tailwindui.com/img/logos/mark.svg?color=white"
+          :src "/images/mark.svg"
           :alt "Your Company"}]])
 
 (defn- sidebar
@@ -133,7 +133,7 @@
              "@click" "open = ! open"}
     [:span {:class "sr-only"} "Open user menu"]
     [:img {:class "h-8 w-8 rounded-full bg-gray-50"
-           :src "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+           :src "/images/profile.avif"
            :alt ""}]
     [:span {:class "hidden lg:flex lg:items-center"}
      [:span {:class "ml-4 text-sm font-semibold leading-6 text-gray-900"
@@ -170,16 +170,22 @@
     header]
    (content app-content)])
 
-(def sections
-  [{:name "Dashboard" :link "/" :icon icons/home :isActive true}
-   {:name "Calendar" :link "/calendar" :icon icons/calendar :isActive false}
-   {:name "Classes" :link "/classes" :icon icons/academic-cap :isActive false}])
-
 (def studios
   [{:name "NEBT School" :link "#" :isActive false}])
 
 (defn render
-  [app-content]
+  [app-content sections]
   [:div
    (desktop-sidebar sections studios)
    (right-side app-content)])
+
+(def static-sections
+  [{:name "Dashboard" :link "/" :icon icons/home :isActive true}
+   {:name "Calendar" :link "/calendar" :icon icons/calendar :isActive false}
+   {:name "Classes" :link "/classes" :icon icons/academic-cap :isActive false}])
+
+(def sidebar-loader
+  {:name ::sidebar-loader
+   :enter (fn [context]
+            (assoc context :sections static-sections))})
+

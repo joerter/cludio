@@ -12,6 +12,7 @@
    [schema.core :as s]
    [next.jdbc.result-set :as rs]
    [hiccup2.core :as h]
+   [cludio.ui.app-shell :as app-shell]
    [cludio.routes.app.dashboard :as app-dashboard]
    [cludio.routes.app.calendar :as app-calendar]))
 
@@ -114,8 +115,8 @@
 
 (def routes
   (route/expand-routes
-   #{["/" :get [app-dashboard/handler] :route-name :index-page ]
-     ["/calendar" :get [app-calendar/handler] :route-name :app-calendar]}))
+   #{["/" :get [app-shell/sidebar-loader app-dashboard/handler] :route-name :index-page]
+     ["/calendar" :get [app-shell/sidebar-loader app-calendar/handler] :route-name :app-calendar]}))
 
 (def url-for (route/url-for-routes routes))
 
