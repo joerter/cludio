@@ -15,7 +15,7 @@
    [cludio.ui.app-shell :as app-shell]
    [cludio.routes.app.dashboard :as app-dashboard]
    [cludio.routes.app.calendar :as app-calendar]
-   [cludio.util :as util]))
+   [cludio.html :as html]))
 
 (s/defschema
   TodoItem
@@ -106,19 +106,10 @@
                        (clojure.pprint/pprint db-response)
                        (assoc context :response {:status 200 :body (str "Database server version" db-response)})))})
 
-(defn html-ok
-  [body]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body (-> body
-             (h/html)
-             (str))})
-
-;; Create interceptor for base html page and response
 (def routes
   (route/expand-routes
-   #{["/" :get [util/interceptor app-shell/interceptor app-dashboard/interceptor] :route-name :index-page]
-     ["/calendar" :get [util/interceptor app-shell/interceptor app-calendar/interceptor] :route-name :app-calendar]}))
+   #{["/" :get [html/full-page-interceptor app-shell/interceptor app-dashboard/interceptor] :route-name :index-page]
+     ["/calendar" :get [html/full-page-interceptor app-shell/interceptor app-calendar/interceptor] :route-name :app-calendar]}))
 
 (def url-for (route/url-for-routes routes))
 

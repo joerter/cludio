@@ -1,8 +1,8 @@
-(ns cludio.util
+(ns cludio.html
   (:require [hiccup2.core :as h]
             [hiccup.page :as p]))
 
-(defn page [body-content title]
+(defn- full-page [body-content title]
   [:html {:class "h-full bg-white"} [:head
                                      [:title (str "Cludio - " title)]
                                      [:meta {:charset "UTF-8"}]
@@ -11,7 +11,7 @@
    [:body {:class "h-full"} body-content
     (p/include-js "/dist/htmx.min.js" "/dist/cdn.js")]])
 
-(defn html-ok
+(defn- ok
   [body]
   {:status 200
    :headers {"Content-Type" "text/html"}
@@ -19,7 +19,7 @@
              (h/html)
              (str))})
 
-(def interceptor
+(def full-page-interceptor
   {:name ::interceptor
    :leave (fn [{:keys [html title] :as context}]
-            (assoc context :response (html-ok (page html title))))})
+            (assoc context :response (ok (full-page html title))))})

@@ -1,7 +1,4 @@
-(ns cludio.routes.app.calendar
-  (:require
-   [cludio.util :as util]
-   [cludio.ui.app-shell :as app-shell]))
+(ns cludio.routes.app.calendar)
 
 (defn root []
   [:h1 "Calendar"])
@@ -10,10 +7,3 @@
   {:name ::interceptor
    :enter (fn [context]
             (assoc context :title "Calendar" :content (root)))})
-
-(comment
-  (def interceptor
-    {:name ::app-calendar-handler
-     :enter (fn [{:keys [::app-shell/sections] :as context}]
-              (let [html (-> (root) (app-shell/render sections) (util/page "Calendar"))]
-                (assoc context :response (util/html-ok html))))}))
