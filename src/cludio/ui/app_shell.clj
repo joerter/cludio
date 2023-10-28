@@ -1,6 +1,8 @@
 (ns cludio.ui.app-shell
   (:require
-   [cludio.ui.icons :as icons]))
+   [cludio.ui.icons :as icons]
+   [cludio.routes.app.dashboard :as dashboard]
+   [cludio.routes.app.calendar :as calendar]))
 
 (defn- app-section
   [{:keys [name link icon isActive]}]
@@ -175,23 +177,22 @@
 
 (defn render
   [sections app-content]
+  (println sections)
   [:div
    (desktop-sidebar sections studios)
    (right-side app-content)])
 
 (def static-sections
-  [{:name "Dashboard" :link "/" :icon icons/home :isActive true}
-   {:name "Calendar" :link "/calendar" :icon icons/calendar :isActive false}
-   {:name "Classes" :link "/classes" :icon icons/academic-cap :isActive false}])
+  [{:name "Dashboard" :link "/" :icon icons/home :page dashboard/page}
+   {:name "Calendar" :link "/calendar" :icon icons/calendar :page calendar/page}
+   {:name "Classes" :link "/classes" :icon icons/academic-cap :page nil}])
+
+(defn get-sections
+  [page]
+  (map (fn [section] (assoc section :isActive (= page (:page section)))) static-sections))
 
 (def interceptor
   {:name ::interceptor
-   :enter (fn [context]
-            (assoc context ::render (partial render static-sections)))
-   :leave (fn [{:keys [::render content] :as context}]
-            (assoc context :html (render content)))})
+   :leave (fn [{:keys [page content] :as context}]
+            (assoc context :html (render (get-sections page) content)))})
 
-(comment
-  (println {::sections static-sections})
-  (assoc {} ::sections static-sections)
-  (println interceptor))
