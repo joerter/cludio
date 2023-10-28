@@ -187,5 +187,8 @@
 (def sidebar-loader
   {:name ::sidebar-loader
    :enter (fn [context]
-            (assoc context :sections static-sections))})
+            (assoc context ::sections static-sections))})
 
+(comment
+  (println {::sections static-sections})
+  (assoc {} ::sections static-sections))

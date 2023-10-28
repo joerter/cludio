@@ -8,6 +8,6 @@
 
 (def handler
   {:name ::app-calendar-handler
-   :enter (fn [{:keys [sections] :as context}]
+   :enter (fn [{:keys [::app-shell/sections] :as context}]
             (let [html (-> (root) (app-shell/render sections) (util/page "Calendar"))]
               (assoc context :response (util/html-ok html))))})
