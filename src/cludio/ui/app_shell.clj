@@ -174,7 +174,7 @@
   [{:name "NEBT School" :link "#" :isActive false}])
 
 (defn render
-  [app-content sections]
+  [sections app-content]
   [:div
    (desktop-sidebar sections studios)
    (right-side app-content)])
@@ -184,11 +184,14 @@
    {:name "Calendar" :link "/calendar" :icon icons/calendar :isActive false}
    {:name "Classes" :link "/classes" :icon icons/academic-cap :isActive false}])
 
-(def sidebar-loader
-  {:name ::sidebar-loader
+(def interceptor
+  {:name ::interceptor
    :enter (fn [context]
-            (assoc context ::sections static-sections))})
+            (assoc context ::render (partial render static-sections)))
+   :leave (fn [{:keys [::render content] :as context}]
+            (assoc context :html (render content)))})
 
 (comment
   (println {::sections static-sections})
-  (assoc {} ::sections static-sections))
+  (assoc {} ::sections static-sections)
+  (println interceptor))

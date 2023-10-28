@@ -6,8 +6,14 @@
 (defn root []
   [:h1 "Calendar"])
 
-(def handler
-  {:name ::app-calendar-handler
-   :enter (fn [{:keys [::app-shell/sections] :as context}]
-            (let [html (-> (root) (app-shell/render sections) (util/page "Calendar"))]
-              (assoc context :response (util/html-ok html))))})
+(def interceptor
+  {:name ::interceptor
+   :enter (fn [context]
+            (assoc context :title "Calendar" :content (root)))})
+
+(comment
+  (def interceptor
+    {:name ::app-calendar-handler
+     :enter (fn [{:keys [::app-shell/sections] :as context}]
+              (let [html (-> (root) (app-shell/render sections) (util/page "Calendar"))]
+                (assoc context :response (util/html-ok html))))}))

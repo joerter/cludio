@@ -18,3 +18,8 @@
    :body (-> body
              (h/html)
              (str))})
+
+(def interceptor
+  {:name ::interceptor
+   :leave (fn [{:keys [html title] :as context}]
+            (assoc context :response (html-ok (page html title))))})

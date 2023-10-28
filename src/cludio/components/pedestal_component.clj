@@ -14,7 +14,8 @@
    [hiccup2.core :as h]
    [cludio.ui.app-shell :as app-shell]
    [cludio.routes.app.dashboard :as app-dashboard]
-   [cludio.routes.app.calendar :as app-calendar]))
+   [cludio.routes.app.calendar :as app-calendar]
+   [cludio.util :as util]))
 
 (s/defschema
   TodoItem
@@ -113,10 +114,11 @@
              (h/html)
              (str))})
 
+;; Create interceptor for base html page and response
 (def routes
   (route/expand-routes
-   #{["/" :get [app-shell/sidebar-loader app-dashboard/handler] :route-name :index-page]
-     ["/calendar" :get [app-shell/sidebar-loader app-calendar/handler] :route-name :app-calendar]}))
+   #{["/" :get [util/interceptor app-shell/interceptor app-dashboard/interceptor] :route-name :index-page]
+     ["/calendar" :get [util/interceptor app-shell/interceptor app-calendar/interceptor] :route-name :app-calendar]}))
 
 (def url-for (route/url-for-routes routes))
 

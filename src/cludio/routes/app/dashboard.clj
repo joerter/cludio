@@ -6,15 +6,14 @@
 (defn root []
   [:h1 "Dashboard"])
 
-(def loader
-  {:name ::app-dashboard-loader
+(def interceptor
+  {:name ::interceptor
    :enter (fn [context]
-            (assoc context :sections {}))})
+            (assoc context :title "Dashboard" :content (root)))})
 
-(def handler
-  {:name ::app-dashboard-handler
-   :enter (fn [{:keys [::app-shell/sections] :as context}]
-            (let [html (-> (root) (app-shell/render sections) (util/page "Dashboard"))]
-              (assoc context :response (util/html-ok html))))})
-
-(comment (util/page [:div "john"] "Dashboard"))
+(comment (util/page [:div "john"] "Dashboard")
+         (def handler
+           {:name ::app-dashboard-handler
+            :enter (fn [{:keys [::app-shell/sections] :as context}]
+                     (let [html (-> (root) (app-shell/render sections) (util/page "Dashboard"))]
+                       (assoc context :response (util/html-ok html))))}))
