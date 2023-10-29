@@ -57,6 +57,16 @@
              :d "M15 12a3 3 0 11-6 0 3 3 0 016 0z"}]]
     "Settings"]])
 
+(def close-sidebar-button
+  [:div {:class "absolute left-full top-0 flex w-16 justify-center pt-5"}
+ [:button {:type "button" :class "-m-2.5 p-2.5"}
+  [:span {:class "sr-only"} "Close sidebar"]
+  [:svg {:class "h-6 w-6 text-white" :fill "none" :viewBox "0 0 24 24" :stroke-width "1.5" :stroke "currentColor" :aria-hidden "true"}
+   [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M6 18L18 6M6 6l12 12"}]]]])
+
+(def off-canvas-menu-backdrop
+  [:div {:class "fixed inset-0 bg-gray-900/80"}])
+
 (defn- sidebar-nav
   [sections studios]
   [:nav {:class "flex flex-1 flex-col"}
@@ -74,17 +84,25 @@
 
 (defn- sidebar
   [sections studios]
-  [:div {:class "flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4"}
+  [:div {:class "flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4" :data-element "sidebar"}
    (sidebar-brand)
    (sidebar-nav sections studios)])
 
+(defn- mobile-sidebar
+  [sections studios]
+  [:div {:class "relative z-50 lg:hidden" :role "dialog" :aria-modal "true" :data-element "mobile-sidebar"}
+   off-canvas-menu-backdrop
+   [:div {:class "fixed inset-0 flex"}
+    close-sidebar-button
+    (sidebar sections studios)]])
+
 (defn- desktop-sidebar
   [sections studios]
-  [:div {:class "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"}
+  [:div {:class "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col" :data-element "desktop-sidebar"}
    (sidebar sections studios)])
 
 (defn content [app-content]
-  [:main {:class "py-10"}
+  [:main {:class "py-10" :data-element "app-content"}
    [:div {:class "px-4 sm:px-6 lg:px-8"}
     app-content]])
 
@@ -111,7 +129,7 @@
          :aria-orientation "vertical"
          :aria-labelledby "user-menu-button"
          :tabindex "-1"
-         :x-show "open"
+         :x-show "profileDropdownMenuOpen"
          :x-transition ""}
    [:a {:href "#"
         :class "block px-3 py-1 text-sm leading-6 text-gray-900"
@@ -126,13 +144,13 @@
 
 (def ^:private profile-dropdown
   [:div {:class "relative"
-         :x-data "{open: false}"}
+         :x-data "{profileDropdownMenuOpen: false}"}
    [:button {:type "button"
              :class "-m-1.5 flex items-center p-1.5"
              :id "user-menu-button"
              :aria-expanded "false"
              :aria-haspopup "true"
-             "@click" "open = ! open"}
+             "@click" "profileDropdownMenuOpen = !profileDropdownMenuOpen"}
     [:span {:class "sr-only"} "Open user menu"]
     [:img {:class "h-8 w-8 rounded-full bg-gray-50"
            :src "/images/profile.avif"
@@ -179,6 +197,7 @@
   [sections app-content]
   (println sections)
   [:div
+   (mobile-sidebar sections studios)
    (desktop-sidebar sections studios)
    (right-side app-content)])
 
