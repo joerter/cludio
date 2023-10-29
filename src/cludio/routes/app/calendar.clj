@@ -10,3 +10,6 @@
   {:name ::interceptor
    :enter (fn [context]
             (assoc context :page page :title "Calendar" :content (root)))})
+
+(comment
+  (assoc {} :page page :title "Calendar" :content (root)))

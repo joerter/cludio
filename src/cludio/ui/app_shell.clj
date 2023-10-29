@@ -58,14 +58,26 @@
     "Settings"]])
 
 (def close-sidebar-button
-  [:div {:class "absolute left-full top-0 flex w-16 justify-center pt-5"}
- [:button {:type "button" :class "-m-2.5 p-2.5"}
-  [:span {:class "sr-only"} "Close sidebar"]
-  [:svg {:class "h-6 w-6 text-white" :fill "none" :viewBox "0 0 24 24" :stroke-width "1.5" :stroke "currentColor" :aria-hidden "true"}
-   [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M6 18L18 6M6 6l12 12"}]]]])
+  [:div {:class "absolute left-full top-0 flex w-16 justify-center pt-5"
+         :x-show "sidebarOpen"
+         :data-element "close-sidebar-button"
+         :x-transition:enter "ease-in-out duration-300"
+         :x-transition:enter-start "opacity-0"
+         :x-transition:enter-end "opacity-100"
+         :x-transition:leave "ease-in-out duration-300"
+         :x-transition:leave-start "opacity-100"
+         :x-transition:leave-end "opacity-0"}
+   [:button {:type "button"
+             :class "-m-2.5 p-2.5"
+             "@click" "sidebarOpen = false"}
+    [:span {:class "sr-only"} "Close sidebar"]
+    [:svg {:class "h-6 w-6 text-white" :fill "none" :viewBox "0 0 24 24" :stroke-width "1.5" :stroke "currentColor" :aria-hidden "true"}
+     [:path {:stroke-linecap "round" :stroke-linejoin "round" :d "M6 18L18 6M6 6l12 12"}]]]])
 
 (def off-canvas-menu-backdrop
-  [:div {:class "fixed inset-0 bg-gray-900/80"}])
+  [:div {:class "fixed inset-0 bg-gray-900/80"
+         :x-show "sidebarOpen"
+         :data-element "off-canvas-menu-backdrop"}])
 
 (defn- sidebar-nav
   [sections studios]
@@ -90,11 +102,24 @@
 
 (defn- mobile-sidebar
   [sections studios]
-  [:div {:class "relative z-50 lg:hidden" :role "dialog" :aria-modal "true" :data-element "mobile-sidebar"}
+  [:div {:class "relative z-50 lg:hidden"
+         :role "dialog"
+         :aria-modal "true"
+         :data-element "mobile-sidebar"
+         :x-show "sidebarOpen"}
    off-canvas-menu-backdrop
    [:div {:class "fixed inset-0 flex"}
-    close-sidebar-button
-    (sidebar sections studios)]])
+    [:div {:class "relative mr-16 flex w-full max-w-xs flex-1"
+           :x-show "sidebarOpen"
+           "@click.away" "sidebarOpen = false"
+           :x-transition:enter "transition ease-in-out duration-300 transform"
+           :x-transition:enter-start "-translate-x-full"
+           :x-transition:enter-end "translate-x-0"
+           :x-transition:leave "transition ease-in-out duration-300 transform"
+           :x-transition:leave-start "translate-x-0"
+           :x-transition:leave-end "-translate-x-full"}
+      close-sidebar-button
+      (sidebar sections studios)]]])
 
 (defn- desktop-sidebar
   [sections studios]
@@ -108,7 +133,8 @@
 
 (def open-sidebar
   [:button {:type "button"
-            :class "-m-2.5 p-2.5 text-gray-700 lg:hidden"}
+            :class "-m-2.5 p-2.5 text-gray-700 lg:hidden"
+            "@click" "sidebarOpen = ! sidebarOpen"}
    [:span {:class "sr-only"} "Open sidebar"]
    [:svg {:class "h-6 w-6"
           :fill "none"
@@ -150,7 +176,7 @@
              :id "user-menu-button"
              :aria-expanded "false"
              :aria-haspopup "true"
-             "@click" "profileDropdownMenuOpen = !profileDropdownMenuOpen"}
+             "@click" "profileDropdownMenuOpen = ! profileDropdownMenuOpen"}
     [:span {:class "sr-only"} "Open user menu"]
     [:img {:class "h-8 w-8 rounded-full bg-gray-50"
            :src "/images/profile.avif"
@@ -197,6 +223,7 @@
   [sections app-content]
   (println sections)
   [:div
+   {:x-data "{sidebarOpen: false}"}
    (mobile-sidebar sections studios)
    (desktop-sidebar sections studios)
    (right-side app-content)])
@@ -204,7 +231,7 @@
 (def static-sections
   [{:name "Dashboard" :link "/" :icon icons/home :page dashboard/page}
    {:name "Calendar" :link "/calendar" :icon icons/calendar :page calendar/page}
-   {:name "Classes" :link "/classes" :icon icons/academic-cap :page nil}])
+   {:name "John" :link "/classes" :icon icons/academic-cap :page nil}])
 
 (defn get-sections
   [page]
