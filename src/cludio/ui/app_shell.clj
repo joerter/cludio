@@ -7,9 +7,9 @@
   (let [active "bg-indigo-700 text-white"
         non-active "text-indigo-200 hover:text-white hover:bg-indigo-700"
         all " group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"]
-[:li
-[:a {:href link
-:class (if isActive (str active all) (str non-active all))}
+    [:li
+     [:a {:href link
+          :class (if isActive (str active all) (str non-active all))}
       icon
       name]]))
 
