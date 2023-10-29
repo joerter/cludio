@@ -1,17 +1,15 @@
 (ns cludio.ui.app-shell
-  (:require
-   [cludio.ui.icons :as icons]
-   [cludio.routes.app.dashboard :as dashboard]
-   [cludio.routes.app.calendar :as calendar]))
+  (:require [cludio.ui.icons :as icons]
+            [cludio.routes.app.dashboard :as dashboard]
+            [cludio.routes.app.calendar :as calendar]))
 
-(defn- app-section
-  [{:keys [name link icon isActive]}]
+(defn- app-section [{:keys [name link icon isActive]}]
   (let [active "bg-indigo-700 text-white"
         non-active "text-indigo-200 hover:text-white hover:bg-indigo-700"
         all " group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"]
-    [:li
-     [:a {:href link
-          :class (if isActive (str active all) (str non-active all))}
+[:li
+[:a {:href link
+:class (if isActive (str active all) (str non-active all))}
       icon
       name]]))
 
@@ -118,8 +116,8 @@
            :x-transition:leave "transition ease-in-out duration-300 transform"
            :x-transition:leave-start "translate-x-0"
            :x-transition:leave-end "-translate-x-full"}
-      close-sidebar-button
-      (sidebar sections studios)]]])
+     close-sidebar-button
+     (sidebar sections studios)]]])
 
 (defn- desktop-sidebar
   [sections studios]

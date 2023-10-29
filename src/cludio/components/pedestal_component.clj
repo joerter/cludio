@@ -1,21 +1,19 @@
 (ns cludio.components.pedestal-component
   (:require
    [cheshire.core :as json]
+   [cludio.html :as html]
+   [cludio.routes.app.calendar :as app-calendar]
+   [cludio.routes.app.dashboard :as app-dashboard]
+   [cludio.ui.app-shell :as app-shell]
    [com.stuartsierra.component :as component]
    [honey.sql :as sql]
    [io.pedestal.http :as http]
-   [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.content-negotiation :as content-negotiation]
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor :as interceptor]
    [next.jdbc :as jdbc]
-   [schema.core :as s]
    [next.jdbc.result-set :as rs]
-   [hiccup2.core :as h]
-   [cludio.ui.app-shell :as app-shell]
-   [cludio.routes.app.dashboard :as app-dashboard]
-   [cludio.routes.app.calendar :as app-calendar]
-   [cludio.html :as html]))
+   [schema.core :as s]))
 
 (s/defschema
   TodoItem
