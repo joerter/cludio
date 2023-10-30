@@ -10,10 +10,10 @@
 (deftest interceptor-test
   (testing ":enter"
     (testing "adds sections to :sections"
-          (let [enter (:enter app-shell/interceptor)
-                context {}
-                result (-> (enter context) ::app-shell/sections)]
-            (is (= false (nil? result)))))
+      (let [enter (:enter app-shell/interceptor)
+            context {}
+            result (-> (enter context) ::app-shell/sections)]
+        (is (= false (nil? result)))))
     (testing "adds sections to :sections with :isActive based on :page"
       (let [enter (:enter app-shell/interceptor)
             context {:page dashboard/page}
@@ -38,5 +38,5 @@
   (let [sut (:leave app-shell/interceptor)]
     (sut {}))
   (first (filter (fn [s] (= "Dashboard" (:name s))) [{:name "Dashboard"}
-   {:name "Calendar" }
-   {:name "Classes" }])))
+                                                     {:name "Calendar"}
+                                                     {:name "Classes"}])))
