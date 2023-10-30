@@ -219,7 +219,6 @@
 
 (defn render
   [sections app-content]
-  (println sections)
   [:div
    {:x-data "{sidebarOpen: false}"}
    (mobile-sidebar sections studios)
@@ -229,7 +228,7 @@
 (def static-sections
   [{:name "Dashboard" :link "/" :icon icons/home :page dashboard/page}
    {:name "Calendar" :link "/calendar" :icon icons/calendar :page calendar/page}
-   {:name "John" :link "/classes" :icon icons/academic-cap :page nil}])
+   {:name "Classes" :link "/classes" :icon icons/academic-cap :page nil}])
 
 (defn get-sections
   [page]
@@ -237,6 +236,7 @@
 
 (def interceptor
   {:name ::interceptor
+   :enter (fn [{:keys [page] :as context}] (assoc context ::sections (get-sections page)))
    :leave (fn [{:keys [page content] :as context}]
             (assoc context :html (render (get-sections page) content)))})
 
