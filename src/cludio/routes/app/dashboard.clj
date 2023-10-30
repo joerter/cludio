@@ -9,4 +9,4 @@
 (def interceptor
   {:name ::interceptor
    :enter (fn [context]
-            (assoc context :page page :title "Dashboard" :content (root)))})
+            (assoc context :title "Dashboard" :content (root)))})

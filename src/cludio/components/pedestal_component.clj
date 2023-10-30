@@ -106,8 +106,8 @@
 
 (def routes
   (route/expand-routes
-   #{["/" :get [html/full-page-interceptor app-shell/interceptor app-dashboard/interceptor] :route-name :index-page]
-     ["/calendar" :get [html/full-page-interceptor app-shell/interceptor app-calendar/interceptor] :route-name :app-calendar]}))
+   #{["/" :get [(html/full-page-interceptor app-dashboard/page) app-shell/interceptor app-dashboard/interceptor] :route-name :index-page]
+     ["/calendar" :get [(html/full-page-interceptor app-calendar/page) app-shell/interceptor app-calendar/interceptor] :route-name :app-calendar]}))
 
 (def url-for (route/url-for-routes routes))
 

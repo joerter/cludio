@@ -19,7 +19,9 @@
              (h/html)
              (str))})
 
-(def full-page-interceptor
+(defn full-page-interceptor
+  [page]
   {:name ::interceptor
+   :enter (fn [context] (assoc context :page page))
    :leave (fn [{:keys [html title] :as context}]
             (assoc context :response (ok (full-page html title))))})

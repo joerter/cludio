@@ -237,6 +237,6 @@
 (def interceptor
   {:name ::interceptor
    :enter (fn [{:keys [page] :as context}] (assoc context ::sections (get-sections page)))
-   :leave (fn [{:keys [page content] :as context}]
-            (assoc context :html (render (get-sections page) content)))})
+   :leave (fn [{:keys [content ::sections] :as context}]
+            (assoc context :html (render sections content)))})
 
