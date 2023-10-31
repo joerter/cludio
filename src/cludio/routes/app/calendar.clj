@@ -8,7 +8,7 @@
   [:div {:x-data "{viewPickerOpen: false}" :class "hidden md:ml-4 md:flex md:items-center"}
    [:div {:class "relative"}
     [:button {:type "button"
-              "@click" "viewPickerOpen = !viewPickerOpen" 
+              "@click" "viewPickerOpen = !viewPickerOpen"
               :class "flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               :id "menu-button"
               :aria-expanded "false"
