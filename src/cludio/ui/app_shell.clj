@@ -228,7 +228,10 @@
 (def static-sections
   [{:name "Dashboard" :link "/" :icon icons/home :page dashboard/page}
    {:name "Calendar" :link "/calendar" :icon icons/calendar :page calendar/page}
-   {:name "Classes" :link "/classes" :icon icons/academic-cap :page nil}])
+   {:name "Classes" :link "/classes" :icon icons/academic-cap :page nil}
+   {:name "Students" :link "/students" :icon icons/academic-cap :page nil}
+   {:name "Teachers" :link "/classes" :icon icons/academic-cap :page nil}
+   {:name "Locations" :link "/classes" :icon icons/academic-cap :page nil}])
 
 (defn get-sections
   [page]
