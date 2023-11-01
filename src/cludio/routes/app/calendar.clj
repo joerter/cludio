@@ -5,7 +5,7 @@
   ::app-calendar)
 
 (defn root []
-  [:div {:class "lg:flex lg:h-full lg:flex-col"} 
+  [:div {:class "lg:flex lg:h-full lg:flex-col"}
    (month-view/header)
    (month-view/month-calendar)])
 
