@@ -12,11 +12,11 @@
                   :is-today false}
         days (range 1 32)
         january (->> days (map (fn
-                                [n]
-                                {:date (str "2023-01-" n)
-                                 :day n
-                                 :is-current-month true
-                                 :is-today (= 1 n)})))]
+                                 [n]
+                                 {:date (str "2023-01-" n)
+                                  :day n
+                                  :is-current-month true
+                                  :is-today (= 1 n)})))]
     (conj january december)))
 
 (defn root [days]
