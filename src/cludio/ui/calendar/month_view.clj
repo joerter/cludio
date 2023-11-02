@@ -129,8 +129,21 @@
     [:span "S"]
     [:span {:class "sr-only sm:not-sr-only"} "un"]]))
 
+(defn month-day [{:keys [is-current-month is-today date day]}]
+  (let [current-month "bg-white"
+        other-month "bg-gray-50 text-gray-500"
+        today "flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"]
+    [:div {:class (str (if is-current-month current-month other-month) "relative bg-gray-50 px-3 py-2 text-gray-500")}
+     [:time {:datetime date :class (if is-today today "")} day]]))
+
+(defn month-days
+  [days]
+  (into [:div {:class "hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px"}] (map month-day days)))
+
 (defn month-calendar
-  []
+  [days]
   [:div {:class "shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col"}
    [:div {:class "grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700 lg:flex-none"}
-    (days-of-the-week)]])
+    (days-of-the-week)]
+   [:div {:class "flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto"}
+    (month-days days)]])
