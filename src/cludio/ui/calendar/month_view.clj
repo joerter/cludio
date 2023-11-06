@@ -133,7 +133,7 @@
   (let [current-month "bg-white"
         other-month "bg-gray-50 text-gray-500"
         today "flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"]
-    [:div {:class (str (if is-current-month current-month other-month) "relative bg-gray-50 px-3 py-2 text-gray-500")}
+    [:div {:class (str (if is-current-month current-month other-month) " relative bg-gray-50 px-3 py-2 text-gray-500")}
      [:time {:datetime date :class (if is-today today "")} day]]))
 
 (defn month-days

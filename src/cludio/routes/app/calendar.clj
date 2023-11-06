@@ -16,8 +16,12 @@
                                  {:date (str "2023-01-" n)
                                   :day n
                                   :is-current-month true
-                                  :is-today (= 1 n)})))]
-    (conj january december)))
+                                  :is-today (= 1 n)})))
+        february (->> (range 1 11) (map (fn [n] {:date (str "2023-02-" n)
+                                                :day n
+                                                :is-current-month false
+                                                :is-today false})))]
+    (conj (concat january february) december)))
 
 (defn root [days]
   [:div {:class "lg:flex lg:h-full lg:flex-col"}
