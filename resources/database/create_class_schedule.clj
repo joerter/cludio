@@ -16,10 +16,6 @@
 (defn execute! [query]
   (jdbc/execute! ds query {:builder-fn rs/as-unqualified-kebab-maps}))
 
-(comment (jdbc/execute! ds ["SELECT * from teacher"] {:builder-fn rs/as-unqualified-kebab-maps}))
-
-;; for each class, schedule it on two or three nights a week. M/W/F or T/R
-;; assign a random teacher to the repetition
 (defn create-season []
   (let [insert-season ["INSERT INTO season (date_range)
 VALUES
@@ -56,19 +52,7 @@ VALUES
                           :columns [:day-of-the-week-id :teacher-id :class-id :time]
                           :values values} (sql/format))]
 
-    (execute! insert-query)
-    (comment insert-query)))
+    (execute! insert-query)))
 
-(comment (create-class-repetitions 1)
-         (jt/local-time 10)
-         (-> {:insert-into [:class-repetition]
-              :columns [:day-of-the-week-id :teacher-id :class-id :time]
-              :values [[1 1 1 "14:00"]]} (sql/format))
-         (comment (into [] (mapcat class->repetitions classes-result)))
-         (let [select-days ["SELECT * FROM day_of_the_week d where d.day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday')"]
-               days-result (execute! select-days)
-               [monday tuesday wednesday thursday] days-result
-               day-groups [[monday wednesday] [tuesday thursday]]]
-           day-groups)
-         (mod 4 4))
+(comment (create-class-repetitions 1))
 
