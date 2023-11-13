@@ -57,6 +57,18 @@ VALUES
 
     (execute! insert-query)))
 
+(defn repetition->schedule
+  [{repetition-id :id class-id :class-id time :time day-of-the-week :dotw} [season-start season-end]]
+  (let [day-before-season-start (jt/minus season-start (jt/days 1))]
+    (loop [all-days (rest (jt/iterate jt/adjust day-before-season-start :next-day-of-week day-of-the-week))
+           season-days []]
+      (let [next-day (first all-days)]
+        (if (jt/after? next-day season-end)
+          season-days
+          (recur (rest all-days) (conj season-days [class-id
+                                                    repetition-id
+                                                    (jt/local-date-time next-day time)])))))))
+
 (defn create-class-schedule
   "For each class-repetition create schedule record for each day from season start to season end"
   [season-id]
@@ -82,8 +94,12 @@ VALUES
                                         (assoc r :dotw (keyword (string/lower-case (:day r))))))
         class-repetitions (->
                            (execute! select-class-repetitions)
-                           enrich-with-dotw)]
-    class-repetitions))
+                           enrich-with-dotw)
+        values (into [] (mapcat (fn [cr] (repetition->schedule cr season)) class-repetitions))
+        insert-query (-> {:insert-into [:class-schedule]
+                          :columns [:class-id :class-repetition-id :datetime]
+                          :values values} (sql/format))]
+    (execute! insert-query)))
 
 (def test-repetition
   {:id 2,
@@ -95,16 +111,6 @@ VALUES
 
 (def season-range
   (list (jt/local-date "yyyy-MM-dd" "2023-09-01") (jt/local-date "yyyy-MM-dd" "2024-06-02")))
-
-(defn repetition->schedule
-  [time day-of-the-week [season-start season-end]]
-  (let [day-before-season-start (jt/minus season-start (jt/days 1))]
-    (loop [all-days (rest (jt/iterate jt/adjust day-before-season-start :next-day-of-week day-of-the-week))
-           season-days []]
-      (let [next-day (first all-days)]
-        (if (jt/after? next-day season-end)
-          season-days
-          (recur (rest all-days) (conj season-days (jt/local-date-time next-day time))))))))
 
 (create-class-schedule 1)
 (comment
