@@ -1,5 +1,7 @@
 (ns cludio.routes.app.calendar
-  (:require [cludio.ui.calendar.month-view :as month-view]))
+  (:require [cludio.ui.calendar.month-view :as month-view]
+            [java-time.api :as jt]
+            [java-time.repl :as jtr]))
 
 (def page
   ::app-calendar)
@@ -23,6 +25,22 @@
                                                  :is-today false})))]
     (conj (concat january february) december)))
 
+(defn first-day-of-month [year month]
+  (let [local-date (jt/local-date year month 1)]
+    (cond
+      (jt/sunday? local-date) :sunday
+      (jt/monday? local-date) :monday
+      (jt/tuesday? local-date) :tuesday
+      (jt/wednesday? local-date) :wednesday
+      (jt/thursday? local-date) :thursday
+      (jt/friday? local-date) :friday
+      (jt/saturday? local-date) :saturday)))
+
+(first-day-of-month 2023 12)
+
+(defn generate-month [year month]
+  (println "generate-month" year month))
+
 (defn root [days]
   [:div {:class "lg:flex lg:h-full lg:flex-col"}
    (month-view/header)
@@ -30,8 +48,12 @@
 
 (def interceptor
   {:name ::interceptor
-   :enter (fn [context]
-            (assoc context :title "Calendar" ::days (derived-days)))
+   :enter (fn [{:keys [:request] :as context}]
+            (let [path-params (:path-params request)
+                  year (:year path-params)
+                  month (:month path-params)]
+              (generate-month year month)
+              (assoc context :title "Calendar" ::days (derived-days))))
    :leave (fn [{:keys [::days] :as context}]
             (assoc context :content (root days)))})
 
