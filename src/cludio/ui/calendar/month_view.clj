@@ -108,6 +108,9 @@
   []
   (list
    [:div {:class "flex justify-center bg-white py-2"}
+    [:span "S"]
+    [:span {:class "sr-only sm:not-sr-only"} "un"]]
+   [:div {:class "flex justify-center bg-white py-2"}
     [:span "M"]
     [:span {:class "sr-only sm:not-sr-only"} "on"]]
    [:div {:class "flex justify-center bg-white py-2"}
@@ -124,10 +127,7 @@
     [:span {:class "sr-only sm:not-sr-only"} "ri"]]
    [:div {:class "flex justify-center bg-white py-2"}
     [:span "S"]
-    [:span {:class "sr-only sm:not-sr-only"} "at"]]
-   [:div {:class "flex justify-center bg-white py-2"}
-    [:span "S"]
-    [:span {:class "sr-only sm:not-sr-only"} "un"]]))
+    [:span {:class "sr-only sm:not-sr-only"} "at"]]))
 
 (defn month-day [{:keys [is-current-month is-today date day]}]
   (let [current-month "bg-white"
