@@ -48,7 +48,7 @@
       (= 5 day-of-week) 1
       (= 6 day-of-week) 0)))
 
-(defn month-view-start-and-end 
+(defn month-view-start-and-end
   "The start and end dates based for a 42 day calendar view for a given year and month"
   [year month]
   (let [first-day-of-month (jt/local-date year month 1)
