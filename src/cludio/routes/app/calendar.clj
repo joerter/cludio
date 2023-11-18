@@ -55,27 +55,31 @@
         last-day-of-month (jt/adjust first-day-of-month :last-day-of-month)
         start-date (jt/minus first-day-of-month (jt/days (previous-month-days first-day-of-month)))
         end-date (jt/plus last-day-of-month (jt/days (next-month-days last-day-of-month)))]
-    [first-day-of-month last-day-of-month start-date end-date]))
+    [first-day-of-month start-date end-date]))
 
 (defn month-view-days
   "Iterate through all days in this month view to create map of local-date
   is-current-month is-today"
-  [first-day-of-month last-day-of-month start end]
-  (loop [all-days (jt/iterate jt/plus start (jt/days 1))
-         result []]
-    (let [next-day (first all-days)]
-      (if (jt/after? next-day end)
-        result
-        (recur (rest all-days)
-               (conj result {:local-date next-day
-                             :is-current-month (every? true?
-                                                       [(jt/after? (jt/plus next-day (jt/days 1)) first-day-of-month) (jt/before? (jt/minus next-day (jt/days 1)) last-day-of-month)])}))))))
+  [first-day-of-month start end]
+  (let [current-month (jt/as first-day-of-month :month-of-year)
+        today (jt/local-date)]
+    (loop [all-days (jt/iterate jt/plus start (jt/days 1))
+           result []]
+      (let [next-day (first all-days)]
+        (if (jt/after? next-day end)
+          result
+          (recur (rest all-days)
+                 (conj result {:local-date next-day
+                               :current-month? (= (jt/as next-day :month-of-year) current-month)
+                               :today? (= next-day today)})))))))
 
 (defn generate-month [year month]
-  (let [[first-day-of-month last-day-of-month start end] (month-view-start-and-end year month)]
-    (month-view-days first-day-of-month last-day-of-month start end)))
+  (let [[first-day-of-month start end] (month-view-start-and-end year month)]
+    (month-view-days first-day-of-month start end)))
 
-(generate-month 2023 10)
+(generate-month 2023 11)
+
+(comment (-> [2023 11] (month-view-start-and-end) (month-view-days)))
 
 (defn root [days]
   [:div {:class "lg:flex lg:h-full lg:flex-col"}
