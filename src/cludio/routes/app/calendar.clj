@@ -27,17 +27,22 @@
                                :current-month? (= (jt/as next-day :month-of-year) month-of-year)
                                :today? (= next-day today)})))))))
 
-(defn root [days]
-  [:div {:class "lg:flex lg:h-full lg:flex-col"}
-   (month-view/header)
-   (month-view/month-calendar days)])
+(defn root [year month days next-month previous-month]
+  (let [next-month-path (str "/calendar/month/" (jt/as next-month :year) "/" (jt/as next-month :month-of-year))
+        prev-month-path (str "/calendar/month/" (jt/as previous-month :year) "/" (jt/as previous-month :month-of-year))]
+    [:div {:class "lg:flex lg:h-full lg:flex-col"}
+     (month-view/header year month next-month-path prev-month-path)
+     (month-view/month-calendar days)]))
 
 (def interceptor
   {:name ::interceptor
    :enter (fn [{:keys [:request] :as context}]
             (let [path-params (:path-params request)
                   year (Integer/parseInt (:year path-params))
-                  month (Integer/parseInt (:month path-params))]
-              (assoc context :title "Calendar" ::days (generate-month (jt/local-date year month 1)))))
-   :leave (fn [{:keys [::days] :as context}]
-            (assoc context :content (root days)))})
+                  month (Integer/parseInt (:month path-params))
+                  first-of-month (jt/local-date year month 1)
+                  next-month (jt/plus first-of-month (jt/months 1))
+                  previous-month (jt/minus first-of-month (jt/months 1))]
+              (assoc context :title "Calendar" ::next-month next-month ::previous-month previous-month ::year year ::month (jt/format "MMMM" first-of-month) ::days (generate-month first-of-month))))
+   :leave (fn [{:keys [::year ::month ::days ::next-month ::previous-month] :as context}]
+            (assoc context :content (root year month days next-month previous-month)))})
