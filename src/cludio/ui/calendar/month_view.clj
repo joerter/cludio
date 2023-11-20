@@ -1,4 +1,5 @@
-(ns cludio.ui.calendar.month-view)
+(ns cludio.ui.calendar.month-view
+  (:require [java-time.api :as jt]))
 
 (defn view-picker
   []
@@ -129,12 +130,12 @@
     [:span "S"]
     [:span {:class "sr-only sm:not-sr-only"} "at"]]))
 
-(defn month-day [{:keys [is-current-month is-today date day]}]
+(defn month-day [{:keys [current-month? today? local-date]}]
   (let [current-month "bg-white"
         other-month "bg-gray-50 text-gray-500"
         today "flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"]
-    [:div {:class (str (if is-current-month current-month other-month) " relative bg-gray-50 px-3 py-2 text-gray-500")}
-     [:time {:datetime date :class (if is-today today "")} day]]))
+    [:div {:class (str (if current-month? current-month other-month) " relative bg-gray-50 px-3 py-2 text-gray-500")}
+     [:time {:datetime (jt/format "yyyy-MM-dd" local-date) :class (if today? today "")} (jt/as local-date :day-of-month)]]))
 
 (defn month-days
   [days]

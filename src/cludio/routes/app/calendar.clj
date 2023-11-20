@@ -89,9 +89,8 @@
   {:name ::interceptor
    :enter (fn [{:keys [:request] :as context}]
             (let [path-params (:path-params request)
-                  year (:year path-params)
-                  month (:month path-params)]
-              (generate-month year month)
-              (assoc context :title "Calendar" ::days (derived-days))))
+                  year (Integer/parseInt (:year path-params))
+                  month (Integer/parseInt (:month path-params))]
+              (assoc context :title "Calendar" ::days (generate-month year month))))
    :leave (fn [{:keys [::days] :as context}]
             (assoc context :content (root days)))})
