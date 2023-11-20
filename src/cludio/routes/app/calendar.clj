@@ -6,79 +6,26 @@
 (def page
   ::app-calendar)
 
-(defn derived-days
-  []
-  (let [december {:date "2022-12-31"
-                  :day "31"
-                  :is-current-month false
-                  :is-today false}
-        days (range 1 32)
-        january (->> days (map (fn
-                                 [n]
-                                 {:date (str "2023-01-" n)
-                                  :day n
-                                  :is-current-month true
-                                  :is-today (= 1 n)})))
-        february (->> (range 1 11) (map (fn [n] {:date (str "2023-02-" n)
-                                                 :day n
-                                                 :is-current-month false
-                                                 :is-today false})))]
-    (conj (concat january february) december)))
+(defn month-view-start
+  "Find the start date to show in the month view based on 42 days and week starting on Sunday"
+  [first-of-month]
+  (let [first-of-month-dow (-> first-of-month (jt/adjust :first-day-of-month) (jt/as :day-of-week))
+        previous-month-days (if (= 7 first-of-month-dow) 0 first-of-month-dow)]
+    (jt/minus first-of-month (jt/days previous-month-days))))
 
-(defn previous-month-days
-  "The number of days from the previous month to show based on the first day of the month and a 35 day month view.
-  The Java Date-Time API uses integer values of 1-7 for days of the week starting with Monday.
-  However, we want to show Sunday as the first day of the week"
-  [first-day-of-month]
-  (let [day-of-week (jt/as first-day-of-month :day-of-week)]
-    (if (= 7 day-of-week) 0 day-of-week)))
-
-(defn next-month-days
-  "The number of days from the next month to show based on the last day of the month and a 35 day month view.
-  The Java Date-Time API uses integer values of 1-7 for days of the week starting with Monday.
-  However, we want to show Sunday as the first day of the week"
-  [last-day-of-month]
-  (let [day-of-week (jt/as last-day-of-month :day-of-week)]
-    (cond
-      (= 7 day-of-week) 6
-      (= 1 day-of-week) 5
-      (= 2 day-of-week) 4
-      (= 3 day-of-week) 3
-      (= 4 day-of-week) 2
-      (= 5 day-of-week) 1
-      (= 6 day-of-week) 0)))
-
-(defn month-view-start-and-end
-  "The start and end dates based for a 35 day calendar view for a given year and month"
-  [year month]
-  (let [first-day-of-month (jt/local-date year month 1)
-        last-day-of-month (jt/adjust first-day-of-month :last-day-of-month)
-        start-date (jt/minus first-day-of-month (jt/days (previous-month-days first-day-of-month)))
-        end-date (jt/plus last-day-of-month (jt/days (next-month-days last-day-of-month)))]
-    [start-date end-date]))
-
-(defn month-view-days
-  "Iterate through all days in this month view to create map of local-date
-  is-current-month is-today"
-  [first-day-of-month start end]
-  (let [current-month (jt/as first-day-of-month :month-of-year)
+(defn generate-month [first-of-month]
+  (let [start-date (month-view-start first-of-month)
+        month-of-year (jt/as first-of-month :month-of-year)
         today (jt/local-date)]
-    (loop [all-days (jt/iterate jt/plus start (jt/days 1))
+    (loop [days (jt/iterate jt/plus start-date (jt/days 1))
            result []]
-      (let [next-day (first all-days)]
-        (if (jt/after? next-day end)
+      (let [next-day (first days)]
+        (if (>= (count result) 42)
           result
-          (recur (rest all-days)
+          (recur (rest days)
                  (conj result {:local-date next-day
-                               :current-month? (= (jt/as next-day :month-of-year) current-month)
+                               :current-month? (= (jt/as next-day :month-of-year) month-of-year)
                                :today? (= next-day today)})))))))
-
-(defn generate-month [year month]
-  (let [first-day-of-month (jt/local-date year month 1)
-        [start end] (month-view-start-and-end year month)]
-    (month-view-days first-day-of-month start end)))
-
-(generate-month 2023 11)
 
 (defn root [days]
   [:div {:class "lg:flex lg:h-full lg:flex-col"}
@@ -91,6 +38,6 @@
             (let [path-params (:path-params request)
                   year (Integer/parseInt (:year path-params))
                   month (Integer/parseInt (:month path-params))]
-              (assoc context :title "Calendar" ::days (generate-month year month))))
+              (assoc context :title "Calendar" ::days (generate-month (jt/local-date year month 1)))))
    :leave (fn [{:keys [::days] :as context}]
             (assoc context :content (root days)))})
