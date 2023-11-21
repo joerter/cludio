@@ -8,8 +8,8 @@
 
 (def routes
   {:calendar {:month {:path "/calendar/month/:year/:month"
-                      :build 
-                      (fn [year month] 
+                      :build
+                      (fn [year month]
                         (str "/calendar/month/" year "/" month))}}})
 
 (comment (read-config))
