@@ -1,7 +1,10 @@
 (ns cludio.routes.app.calendar
   (:require [cludio.ui.calendar.month-view :as month-view]
+            [cludio.config :as config]
             [java-time.api :as jt]
             [java-time.repl :as jtr]))
+
+(def route-builder (-> config/routes :calendar :month :build))
 
 (def page
   ::app-calendar)
@@ -28,8 +31,8 @@
                                :today? (= next-day today)})))))))
 
 (defn root [year month days next-month previous-month]
-  (let [next-month-path (str "/calendar/month/" (jt/as next-month :year) "/" (jt/as next-month :month-of-year))
-        prev-month-path (str "/calendar/month/" (jt/as previous-month :year) "/" (jt/as previous-month :month-of-year))]
+  (let [next-month-path (apply route-builder (jt/as next-month :year :month-of-year))
+        prev-month-path (apply route-builder (jt/as previous-month :year :month-of-year))]
     [:div {:class "lg:flex lg:h-full lg:flex-col"}
      (month-view/header year month next-month-path prev-month-path)
      (month-view/month-calendar days)]))
