@@ -112,7 +112,6 @@ VALUES
 (def season-range
   (list (jt/local-date "yyyy-MM-dd" "2023-09-01") (jt/local-date "yyyy-MM-dd" "2024-06-02")))
 
-(create-class-schedule 1)
 (comment
   (repetition->schedule "16:00" :monday season-range)
   (conj [1 2] 3)
