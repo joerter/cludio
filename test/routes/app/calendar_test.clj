@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [cludio.routes.app.calendar :as cal]
             [java-time.api :as jt]
-            [util :as util]))
+            [cludio.test-util :as util]))
 
 (deftest month-view-start
   (testing "returns the start date for month view based on 42 days and Sunday as first day of the week"
