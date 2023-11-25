@@ -32,7 +32,7 @@
                                :today? (= next-day today)})))))))
 
 (defn get-classes [db start end]
-  (let [class-coll (classes-db/classes-by-date-range db start end)] 
+  (let [class-coll (classes-db/classes-by-date-range db start end)]
     {}))
 
 (defn generate-month [data-source first-of-month]
