@@ -54,8 +54,25 @@
             (let [start (jt/local-date 2023 9 1)
                   end (jt/local-date 2023 9 30)
                   result (cal/get-classes data-source start end)]
-              (is (= 2 (count result)))))))
+              (is (= true (map? result)))
+              (is (= 1 (->> (jt/local-date 2023 9 4)
+                            (jt/format "YYYY-MM-dd")
+                            keyword
+                            (get result)
+                            count)))
+              (is (= 1 (->> (jt/local-date 2023 9 6)
+                            (jt/format "YYYY-MM-dd")
+                            keyword
+                            (get result)
+                            count)))))))
       (finally
         (.stop database-container)))))
 
-(comment (run-tests))
+(comment (run-tests)
+         (keyword "hey")
+         (->> (jt/local-date 2023 10 14)
+              (jt/format "YYYY-MM-dd")
+              keyword)
+         (let [key (jt/local-date 2023 10 14)
+               m {key "johns bday"}]
+           (get m (jt/local-date 2023 10 14))))
