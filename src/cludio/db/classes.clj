@@ -40,5 +40,5 @@
          ;; also need to make sure I'm not messing up the dates
          ;; when they are grabbed from the db
          (reduce (fn [acc {:keys [datetime] :as c}]
-                   (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)] 
+                   (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
                      (assoc acc k c))) {} classes))
