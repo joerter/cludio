@@ -1,6 +1,7 @@
 (ns cludio.db.classes
   (:require [next.jdbc :as jdbc]
             [next.jdbc.result-set :as rs]
+            [next.jdbc.date-time :as ndt]
             [honey.sql :as sql]
             [java-time.api :as jt]))
 
@@ -36,9 +37,10 @@
 
 (comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
          (count classes)
-         ;; Need to convert sql timestamp to java date here
-         ;; also need to make sure I'm not messing up the dates
-         ;; when they are grabbed from the db
-         (reduce (fn [acc {:keys [datetime] :as c}]
+         (ndt/read-as-local)
+         (reduce (fn [acc {:keys [datetime] :as current-class}]
                    (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
-                     (assoc acc k c))) {} classes))
+                     (update acc k (fn [existing-value]
+                                     (if existing-value
+                                       (conj existing-value current-class)
+                                       [current-class]))))) {} classes))
