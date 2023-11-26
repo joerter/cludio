@@ -13,7 +13,8 @@
    [io.pedestal.interceptor :as interceptor]
    [next.jdbc :as jdbc]
    [next.jdbc.result-set :as rs]
-   [schema.core :as s]))
+   [schema.core :as s]
+   [next.jdbc.date-time :as ndt]))
 
 (s/defschema
   TodoItem
@@ -126,6 +127,7 @@
 
   (start [component]
     (println "Starting Pedestal...")
+    (ndt/read-as-local)
     (let [server (-> {::http/routes routes
                       ::http/type :jetty
                       ::http/join? false
