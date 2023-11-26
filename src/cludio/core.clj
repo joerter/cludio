@@ -6,6 +6,7 @@
    [cludio.components.pedestal-component :as pedestal-component]
    [cludio.config :as config]
    [com.stuartsierra.component :as component]
+   [next.jdbc.date-time :as ndt]
    [next.jdbc.connection :as connection])
   (:import
    (com.zaxxer.hikari HikariDataSource)
@@ -15,6 +16,7 @@
   (connection/component HikariDataSource (assoc (:db-spec config)
                                                 :init-fn (fn [datasource]
                                                            (log/info "Running Database init")
+                                                           (ndt/read-as-local)
                                                            (.migrate
                                                             (.. (Flyway/configure)
                                                                 (dataSource datasource)
