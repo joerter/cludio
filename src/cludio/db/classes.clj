@@ -11,7 +11,7 @@
    :user     "cludio"
    :password "cludio"})
 
-(def db (jdbc/get-datasource db-spec))
+(defn db [] (jdbc/get-datasource db-spec))
 
 (defn classes-by-date-range
   [db start-date end-date]
@@ -34,4 +34,11 @@
         classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})]
     classes))
 
-(comment (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
+(comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
+         (count classes)
+         ;; Need to convert sql timestamp to java date here
+         ;; also need to make sure I'm not messing up the dates
+         ;; when they are grabbed from the db
+         (reduce (fn [acc {:keys [datetime] :as c}]
+                   (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)] 
+                     (assoc acc k c))) {} classes))
