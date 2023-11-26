@@ -34,11 +34,11 @@
 (defn get-classes [db start end]
   (let [classes (classes-db/classes-by-date-range db start end)]
     (reduce (fn [acc {:keys [datetime] :as current-class}]
-                   (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
-                     (update acc k (fn [existing-value]
-                                     (if existing-value
-                                       (conj existing-value current-class)
-                                       [current-class]))))) {} classes)))
+              (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
+                (update acc k (fn [existing-value]
+                                (if existing-value
+                                  (conj existing-value current-class)
+                                  [current-class]))))) {} classes)))
 
 (defn generate-month [data-source first-of-month]
   (let [month-days (month-view first-of-month)
