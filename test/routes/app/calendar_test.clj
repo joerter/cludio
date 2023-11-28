@@ -18,6 +18,82 @@
     (is (= 42 (count (cal/month-view (jt/local-date 2023 11 1)))))
     (is (= 42 (count (cal/month-view (jt/local-date 2023 12 1)))))))
 
+(deftest enrich-days-with-classes
+  (testing "it adds classes to the :classes keyword on each day"
+    (let [month-days [{:local-date (jt/local-date 2023 10 29)
+                       :current-month? false
+                       :today? false}
+                      {:local-date (jt/local-date 2023 10 30)
+                       :current-month? false
+                       :today? false}
+                      {:local-date (jt/local-date 2023 10 31)
+                       :current-month? false
+                       :today? false}]
+          classes {:2023-10-29 [{:class-schedule-id 1,
+                                 :datetime
+                                 (jt/local-date 2023 10 29),
+                                 :class-id 1,
+                                 :name "Hip Hop",
+                                 :teacher-id 1,
+                                 :first-name "Test",
+                                 :last-name "Teacher"}
+                                {:class-schedule-id 2,
+                                 :datetime
+                                 (jt/local-date 2023 10 29),
+                                 :class-id 2,
+                                 :name "Creative Movement",
+                                 :teacher-id 2,
+                                 :first-name "Test",
+                                 :last-name "Teacher 2"}]
+                   :2023-10-30 [{:class-schedule-id 3,
+                                 :datetime
+                                 (jt/local-date 2023 10 30),
+                                 :class-id 1,
+                                 :name "Hip Hop",
+                                 :teacher-id 1,
+                                 :first-name "Test",
+                                 :last-name "Teacher"}]}
+          expected [{:local-date (jt/local-date 2023 10 29)
+                     :current-month? false
+                     :today? false
+                     :classes
+                     [{:class-schedule-id 1,
+                       :datetime
+                       (jt/local-date 2023 10 29),
+                       :class-id 1,
+                       :name "Hip Hop",
+                       :teacher-id 1,
+                       :first-name "Test",
+                       :last-name "Teacher"}
+                      {:class-schedule-id 2,
+                       :datetime
+                       (jt/local-date 2023 10 29),
+                       :class-id 2,
+                       :name "Creative Movement",
+                       :teacher-id 2,
+                       :first-name "Test",
+                       :last-name "Teacher 2"}]}
+                    {:local-date (jt/local-date 2023 10 30)
+                     :current-month? false
+                     :today? false
+                     :classes
+                     [{:class-schedule-id 3,
+                       :datetime
+                       (jt/local-date 2023 10 30),
+                       :class-id 1,
+                       :name "Hip Hop",
+                       :teacher-id 1,
+                       :first-name "Test",
+                       :last-name "Teacher"}]}
+                    {:local-date (jt/local-date 2023 10 31)
+                     :current-month? false
+                     :today? false
+                     :classes []}]
+          actual (cal/enrich-days-with-classes month-days classes)]
+      (comment (is (= expected actual)))
+      actual)))
+(run-tests)
+
 (deftest get-classes-test
   (let [database-container (util/create-database-container)]
     (try

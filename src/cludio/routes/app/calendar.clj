@@ -40,6 +40,10 @@
                                   (conj existing-value current-class)
                                   [current-class]))))) {} classes)))
 
+(defn enrich-days-with-classes [month-days classes]
+  (map (fn [{:keys [:local-date] :as day}]
+         (assoc day :classes (get classes (->> local-date (jt/format "YYYY-MM-dd") keyword) []))) month-days))
+
 (defn generate-month [data-source first-of-month]
   (let [month-days (month-view first-of-month)
         start (-> (first month-days) :local-date)
@@ -68,3 +72,6 @@
               (assoc context :title "Calendar" ::next-month next-month ::previous-month previous-month ::year year ::month (jt/format "MMMM" first-of-month) ::days (generate-month data-source first-of-month))))
    :leave (fn [{:keys [::year ::month ::days ::next-month ::previous-month] :as context}]
             (assoc context :content (root year month days next-month previous-month)))})
+
+(comment
+  (month-view (jt/local-date 2023 11 1)))
