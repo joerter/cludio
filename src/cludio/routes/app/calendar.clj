@@ -2,10 +2,12 @@
   (:require [cludio.ui.calendar.month-view :as month-view]
             [cludio.db.classes :as classes-db]
             [cludio.config :as config]
-            [java-time.api :as jt]
-            [java-time.repl :as jtr]))
+            [java-time.api :as jt]))
 
 (def route-builder (-> config/routes :calendar :month :build))
+
+(defn local-date->keyword [local-date]
+  (->> local-date (jt/format "YYYY-MM-dd") keyword))
 
 (def page
   ::app-calendar)
@@ -17,7 +19,9 @@
         previous-month-days (if (= 7 first-of-month-dow) 0 first-of-month-dow)]
     (jt/minus first-of-month (jt/days previous-month-days))))
 
-(defn month-view [first-of-month]
+(defn month-view
+  "Finds the 42 days to display based on the first day of the month"
+  [first-of-month]
   (let [start-date (month-view-start first-of-month)
         month-of-year (jt/as first-of-month :month-of-year)
         today (jt/local-date)]
@@ -31,27 +35,34 @@
                                :current-month? (= (jt/as next-day :month-of-year) month-of-year)
                                :today? (= next-day today)})))))))
 
-(defn get-classes [db start end]
-  (let [classes (classes-db/classes-by-date-range db start end)]
-    (reduce (fn [acc {:keys [datetime] :as current-class}]
-              (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
-                (update acc k (fn [existing-value]
-                                (if existing-value
-                                  (conj existing-value current-class)
-                                  [current-class]))))) {} classes)))
+(defn get-classes
+  "Gets classes from db based on start and end date. Transforms the coll into a map with local-date key"
+  [db start end]
+  (reduce (fn [acc {:keys [datetime] :as current-class}]
+            (update acc (local-date->keyword datetime)
+                    (fn [existing-value]
+                      (if existing-value
+                        (conj existing-value current-class)
+                        [current-class])))) {}
+          (classes-db/classes-by-date-range db start end)))
 
-(defn enrich-days-with-classes [month-days classes]
+(defn enrich-days-with-classes
+  "Adds a :classes key to month-days with the coll of classes on that day"
+  [month-days classes]
   (map (fn [{:keys [:local-date] :as day}]
-         (assoc day :classes (get classes (->> local-date (jt/format "YYYY-MM-dd") keyword) []))) month-days))
+         (assoc day :classes (get classes (local-date->keyword local-date) []))) month-days))
 
-(defn generate-month [data-source first-of-month]
+(defn generate-month
+  "Generates all the days to display for the month, along with classes"
+  [data-source first-of-month]
   (let [month-days (month-view first-of-month)
         start (-> (first month-days) :local-date)
-        end (-> (last month-days) :local-date)
-        classes (get-classes data-source start end)]
-    (enrich-days-with-classes month-days classes)))
+        end (-> (last month-days) :local-date)]
+    (enrich-days-with-classes month-days (get-classes data-source start end))))
 
-(defn root [year month days next-month previous-month]
+(defn root
+  "Build the month calendar UI"
+  [year month days next-month previous-month]
   (let [next-month-path (apply route-builder (jt/as next-month :year :month-of-year))
         prev-month-path (apply route-builder (jt/as previous-month :year :month-of-year))]
     [:div {:class "lg:flex lg:h-full lg:flex-col"}

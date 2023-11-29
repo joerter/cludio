@@ -92,7 +92,6 @@
           actual (cal/enrich-days-with-classes month-days classes)]
       (comment (is (= expected actual)))
       actual)))
-(run-tests)
 
 (deftest get-classes-test
   (let [database-container (util/create-database-container)]
