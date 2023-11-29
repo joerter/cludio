@@ -49,8 +49,7 @@
         start (-> (first month-days) :local-date)
         end (-> (last month-days) :local-date)
         classes (get-classes data-source start end)]
-    (println classes)
-    month-days))
+    (enrich-days-with-classes month-days classes)))
 
 (defn root [year month days next-month previous-month]
   (let [next-month-path (apply route-builder (jt/as next-month :year :month-of-year))
