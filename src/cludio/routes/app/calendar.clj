@@ -2,7 +2,8 @@
   (:require [cludio.ui.calendar.month-view :as month-view]
             [cludio.db.classes :as classes-db]
             [cludio.config :as config]
-            [java-time.api :as jt]))
+            [java-time.api :as jt]
+            [io.pedestal.interceptor.error :as p-error]))
 
 (def route-builder (-> config/routes :calendar :month :build))
 
@@ -72,9 +73,8 @@
 (def interceptor
   {:name ::interceptor
    :enter (fn [{:keys [:request dependencies] :as context}]
-            (let [path-params (:path-params request)
-                  year (Integer/parseInt (:year path-params))
-                  month (Integer/parseInt (:month path-params))
+            (let [year (-> request :path-params :year Integer/parseInt)
+                  month (-> request :path-params :month Integer/parseInt)
                   first-of-month (jt/local-date year month 1)
                   next-month (jt/plus first-of-month (jt/months 1))
                   previous-month (jt/minus first-of-month (jt/months 1))
@@ -82,6 +82,13 @@
               (assoc context :title "Calendar" ::next-month next-month ::previous-month previous-month ::year year ::month (jt/format "MMMM" first-of-month) ::days (generate-month data-source first-of-month))))
    :leave (fn [{:keys [::year ::month ::days ::next-month ::previous-month] :as context}]
             (assoc context :content (root year month days next-month previous-month)))})
+
+(def error-handler-interceptor
+  (p-error/error-dispatch [ctx ex]
+                          [{:exception-type :java.lang.NumberFormatException :interceptor ::interceptor}]
+                          (assoc ctx :response {:status 400 :body "Bad request"})
+                          :else
+                          (assoc ctx :io.pedestal.interceptor.chain/error ex)))
 
 (comment
   (month-view (jt/local-date 2023 11 1)))
