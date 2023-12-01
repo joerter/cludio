@@ -3,7 +3,9 @@
             [next.jdbc.result-set :as rs]
             [next.jdbc.date-time :as ndt]
             [honey.sql :as sql]
-            [java-time.api :as jt]))
+            [java-time.api :as jt]
+            [malli.core :as m]
+            [malli.experimental.time :as met]))
 
 (def db-spec
   {:dbtype   "postgresql"
@@ -13,6 +15,21 @@
    :password "cludio"})
 
 (defn db [] (jdbc/get-datasource db-spec))
+
+(mr/set-default-registry!
+  (mr/composite-registry
+    (m/default-schemas)
+    (met/schemas)))
+
+(def ClassSchedule
+  [:map 
+   [:class-schedule-id int?]
+   [:datetime :time/local-date]
+   [:class-id int?]
+   [:name string?]
+   [:teacher-id int?]
+   [:first-name string?]
+   [:last-name string?]])
 
 (defn classes-by-date-range
   [db start-date end-date]
@@ -37,6 +54,7 @@
 
 (comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
          (count classes)
+         (m/validate ClassSchedule (first classes))
          (ndt/read-as-local)
          (reduce (fn [acc {:keys [datetime] :as current-class}]
                    (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
