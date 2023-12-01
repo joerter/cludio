@@ -17,12 +17,12 @@
 (defn db [] (jdbc/get-datasource db-spec))
 
 (mr/set-default-registry!
-  (mr/composite-registry
-    (m/default-schemas)
-    (met/schemas)))
+ (mr/composite-registry
+  (m/default-schemas)
+  (met/schemas)))
 
 (def ClassSchedule
-  [:map 
+  [:map
    [:class-schedule-id int?]
    [:datetime :time/local-date]
    [:class-id int?]
