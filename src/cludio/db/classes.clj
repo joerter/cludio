@@ -5,7 +5,8 @@
             [honey.sql :as sql]
             [java-time.api :as jt]
             [malli.core :as m]
-            [malli.experimental.time :as met]))
+            [malli.experimental.time :as met]
+            [malli.registry :as mr]))
 
 (def db-spec
   {:dbtype   "postgresql"
@@ -16,15 +17,10 @@
 
 (defn db [] (jdbc/get-datasource db-spec))
 
-(mr/set-default-registry!
- (mr/composite-registry
-  (m/default-schemas)
-  (met/schemas)))
-
-(def ClassSchedule
+(def ScheduledClass
   [:map
    [:class-schedule-id int?]
-   [:datetime :time/local-date]
+   [:datetime inst?]
    [:class-id int?]
    [:name string?]
    [:teacher-id int?]
@@ -50,11 +46,16 @@
                             :order-by [:cs.datetime]}
                            (sql/format))
         classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})]
+    (m/validate [:vector ScheduledClass] classes)
     classes))
 
 (comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
          (count classes)
-         (m/validate ClassSchedule (first classes))
+         (m/validate [:vector ScheduledClass] classes)
+         (mr/set-default-registry!
+          (mr/composite-registry
+           (m/default-schemas)
+           (met/schemas)))
          (ndt/read-as-local)
          (reduce (fn [acc {:keys [datetime] :as current-class}]
                    (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
