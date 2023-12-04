@@ -18,7 +18,7 @@
 (defn db [] (jdbc/get-datasource db-spec))
 
 (def ScheduledClass
-  [:map
+  [:map {:closed true}
    [:class-schedule-id int?]
    [:datetime inst?]
    [:class-id int?]
@@ -26,6 +26,9 @@
    [:teacher-id int?]
    [:first-name string?]
    [:last-name string?]])
+
+(def ScheduledClasses
+  [:vector ScheduledClass])
 
 (defn classes-by-date-range
   [db start-date end-date]
@@ -45,9 +48,11 @@
                                     [:<= :cs.datetime end-date]]
                             :order-by [:cs.datetime]}
                            (sql/format))
-        classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})]
-    (m/validate [:vector ScheduledClass] classes)
-    classes))
+        classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})
+        valid? (m/validate ScheduledClasses classes)]
+    (if valid?
+      classes
+      (throw (Exception. "Invalid schema")))))
 
 (comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
          (count classes)
