@@ -5,8 +5,7 @@
             [honey.sql :as sql]
             [java-time.api :as jt]
             [malli.core :as m]
-            [malli.experimental.time :as met]
-            [malli.registry :as mr]))
+            [malli.error :as me]))
 
 (def db-spec
   {:dbtype   "postgresql"
@@ -52,15 +51,10 @@
         valid? (m/validate ScheduledClasses classes)]
     (if valid?
       classes
-      (throw (Exception. "Invalid schema")))))
+      (throw (ex-info "Invalid ScheduledClasses from db" {:malli-humanize (-> ScheduledClasses (m/explain classes) (me/humanize))})))))
 
 (comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
          (count classes)
-         (m/validate [:vector ScheduledClass] classes)
-         (mr/set-default-registry!
-          (mr/composite-registry
-           (m/default-schemas)
-           (met/schemas)))
          (ndt/read-as-local)
          (reduce (fn [acc {:keys [datetime] :as current-class}]
                    (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
