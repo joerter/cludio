@@ -1,11 +1,15 @@
 (ns cludio.db.classes
-  (:require [next.jdbc :as jdbc]
-            [next.jdbc.result-set :as rs]
-            [next.jdbc.date-time :as ndt]
-            [honey.sql :as sql]
-            [java-time.api :as jt]
-            [malli.core :as m]
-            [malli.error :as me]))
+  (:require
+   [honey.sql :as sql]
+   [java-time.api :as jt]
+   [malli.core :as m]
+   [malli.dev :as mdev]
+   [malli.dev.pretty :as mpretty]
+   [malli.experimental.time :as met]
+   [malli.registry :as mr]
+   [next.jdbc :as jdbc]
+   [next.jdbc.date-time :as ndt]
+   [next.jdbc.result-set :as rs]))
 
 (def db-spec
   {:dbtype   "postgresql"
@@ -19,7 +23,7 @@
 (def ScheduledClass
   [:map {:closed true}
    [:class-schedule-id int?]
-   [:datetime inst?]
+   [:datetime :time/local-date-time] ;; needs to be a local time
    [:class-id int?]
    [:name string?]
    [:teacher-id int?]
@@ -30,6 +34,8 @@
   [:vector ScheduledClass])
 
 (defn classes-by-date-range
+  "Gets rows from the class_schedule table for the given date range"
+  {:malli/schema [:=> [:cat :any :time/local-date :time/local-date] ScheduledClasses]}
   [db start-date end-date]
   (let [select-classes (-> {:select [[:cs.id :class-schedule-id]
                                      [:cs.datetime]
@@ -47,15 +53,20 @@
                                     [:<= :cs.datetime end-date]]
                             :order-by [:cs.datetime]}
                            (sql/format))
-        classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})
-        valid? (m/validate ScheduledClasses classes)]
-    (if valid?
-      classes
-      (throw (ex-info "Invalid ScheduledClasses from db" {:malli-humanize (-> ScheduledClasses (m/explain classes) (me/humanize))})))))
+        classes (jdbc/execute! (db) select-classes {:builder-fn rs/as-unqualified-kebab-maps})]
+    classes))
 
-(comment (def classes (classes-by-date-range db (jt/local-date 2023 11 1) (jt/local-date 2023 11 30)))
+(comment (def classes (classes-by-date-range db (jt/local-date 2023 9 1) (jt/local-date 2023 9 30)))
+         (first classes)
+         (m/explain ScheduledClass (first classes))
          (count classes)
+         (mdev/start! {:report (mpretty/reporter)})
+         (m/function-schemas)
          (ndt/read-as-local)
+         (mr/set-default-registry!
+          (mr/composite-registry
+           (m/default-schemas)
+           (met/schemas)))
          (reduce (fn [acc {:keys [datetime] :as current-class}]
                    (let [k (->> datetime (jt/format "YYYY-MM-dd") keyword)]
                      (update acc k (fn [existing-value]

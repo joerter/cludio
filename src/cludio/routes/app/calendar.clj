@@ -1,10 +1,10 @@
 (ns cludio.routes.app.calendar
-  (:require [cludio.ui.calendar.month-view :as month-view]
-            [cludio.db.classes :as classes-db]
-            [cludio.config :as config]
-            [malli.core :as m]
-            [java-time.api :as jt]
-            [io.pedestal.interceptor.error :as p-error]))
+  (:require
+   [cludio.config :as config]
+   [cludio.db.classes :as classes-db]
+   [cludio.ui.calendar.month-view :as month-view]
+   [io.pedestal.interceptor.error :as p-error]
+   [java-time.api :as jt]))
 
 (def route-builder (-> config/routes :calendar :month :build))
 
@@ -62,10 +62,6 @@
         end (-> (last month-days) :local-date)]
     (enrich-days-with-classes month-days (get-classes data-source start end))))
 
-(comment (def root-args
-           (m/schema [:map
-                      [:year :int]
-                      [:month :int]])))
 (defn root
   "Build the month calendar UI"
   [year month days next-month previous-month]
@@ -82,7 +78,11 @@
                   month (-> request :path-params :month Integer/parseInt)
                   first-of-month (jt/local-date year month 1)
                   {:keys [data-source]} dependencies]
-              (assoc context :title "Calendar" ::next-month (jt/plus first-of-month (jt/months 1)) ::previous-month (jt/minus first-of-month (jt/months 1)) ::year year ::month (jt/format "MMMM" first-of-month) ::days (generate-month data-source first-of-month))))
+              (assoc context :title "Calendar"
+                     ::next-month (jt/plus first-of-month (jt/months 1))
+                     ::previous-month (jt/minus first-of-month (jt/months 1))
+                     ::year year ::month (jt/format "MMMM" first-of-month)
+                     ::days (generate-month data-source first-of-month))))
    :leave (fn [{:keys [::year ::month ::days ::next-month ::previous-month] :as context}]
             (assoc context :content (root year month days next-month previous-month)))})
 

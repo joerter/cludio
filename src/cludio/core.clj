@@ -7,7 +7,10 @@
    [cludio.config :as config]
    [com.stuartsierra.component :as component]
    [next.jdbc.date-time :as ndt]
-   [next.jdbc.connection :as connection])
+   [next.jdbc.connection :as connection]
+   [malli.core :as m]
+   [malli.registry :as mr]
+   [malli.experimental.time :as met])
   (:import
    (com.zaxxer.hikari HikariDataSource)
    [org.flywaydb.core Flyway]))
@@ -17,6 +20,10 @@
                                                 :init-fn (fn [datasource]
                                                            (log/info "Running Database init")
                                                            (ndt/read-as-local)
+                                                           (mr/set-default-registry!
+                                                            (mr/composite-registry
+                                                             (m/default-schemas)
+                                                             (met/schemas)))
                                                            (.migrate
                                                             (.. (Flyway/configure)
                                                                 (dataSource datasource)
