@@ -4,6 +4,7 @@
    [cludio.db.classes :as classes-db]
    [cludio.ui.calendar.month-view :as month-view]
    [io.pedestal.interceptor.error :as p-error]
+   [malli.util :as mu]
    [java-time.api :as jt]))
 
 (def route-builder (-> config/routes :calendar :month :build))
@@ -14,8 +15,24 @@
 (def page
   ::app-calendar)
 
+(def MonthDay
+  [:map
+   [:local-date :time/local-date]
+   [:current-month? boolean?]
+   [:today? boolean?]])
+
+(def MonthDayWithClasses
+  (mu/merge MonthDay [:map [:classes any?]]))
+
+(def MonthDays
+  [:vector MonthDay])
+
+(def ScheduledClassesOnDay
+  [:map-of :keyword any?])
+
 (defn month-view-start
   "Find the start date to show in the month view based on 42 days and week starting on Sunday"
+  {:malli/schema [:=> [:cat :time/local-date] :time/local-date]}
   [first-of-month]
   (let [first-of-month-dow (-> first-of-month (jt/adjust :first-day-of-month) (jt/as :day-of-week))
         previous-month-days (if (= 7 first-of-month-dow) 0 first-of-month-dow)]
@@ -23,6 +40,7 @@
 
 (defn month-view
   "Finds the 42 days to display based on the first day of the month"
+  {:malli/schema [:=> [:cat :time/local-date] MonthDays]}
   [first-of-month]
   (let [start-date (month-view-start first-of-month)
         month-of-year (jt/as first-of-month :month-of-year)
@@ -39,6 +57,7 @@
 
 (defn get-classes
   "Gets classes from db based on start and end date. Transforms the coll into a map with local-date key"
+  {:malli/schema [:=> [:cat :any :time/local-date :time/local-date] ScheduledClassesOnDay]}
   [db start end]
   (reduce (fn [acc {:keys [datetime] :as current-class}]
             (update acc (local-date->keyword datetime)
@@ -50,12 +69,16 @@
 
 (defn enrich-days-with-classes
   "Adds a :classes key to month-days with the coll of classes on that day"
+  {:malli/schema [:=> [:cat MonthDays ScheduledClassesOnDay] MonthDayWithClasses]}
   [month-days classes]
   (map (fn [{:keys [:local-date] :as day}]
-         (assoc day :classes (get classes (local-date->keyword local-date) []))) month-days))
+         (assoc day 
+                :classes (get classes (local-date->keyword local-date) []))) 
+       month-days))
 
 (defn generate-month
   "Generates all the days to display for the month, along with classes"
+  {:malli/schema [:=> [:cat :any :time/local-date] :any]}
   [data-source first-of-month]
   (let [month-days (month-view first-of-month)
         start (-> (first month-days) :local-date)

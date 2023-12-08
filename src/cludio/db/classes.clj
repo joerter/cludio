@@ -31,7 +31,7 @@
    [:last-name string?]])
 
 (def ScheduledClasses
-  [:vector ScheduledClass])
+  [:* ScheduledClass])
 
 (defn classes-by-date-range
   "Gets rows from the class_schedule table for the given date range"
@@ -60,6 +60,8 @@
          (first classes)
          (m/explain ScheduledClass (first classes))
          (count classes)
+         (m/validate [:map-of :keyword int?] {:john 1 :oerter 2})
+         (m/validate [:map [:classes [:schema ScheduledClasses]]] {:classes 1})
          (mdev/start! {:report (mpretty/reporter)})
          (m/function-schemas)
          (ndt/read-as-local)
