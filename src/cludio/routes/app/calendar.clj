@@ -72,8 +72,8 @@
   {:malli/schema [:=> [:cat MonthDays ScheduledClassesOnDay] MonthDayWithClasses]}
   [month-days classes]
   (map (fn [{:keys [:local-date] :as day}]
-         (assoc day 
-                :classes (get classes (local-date->keyword local-date) []))) 
+         (assoc day
+                :classes (get classes (local-date->keyword local-date) [])))
        month-days))
 
 (defn generate-month
