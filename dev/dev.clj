@@ -1,21 +1,27 @@
 (ns dev
   (:require
-   [cludio.core :as core]
    [cludio.config :as config]
+   [cludio.core :as core]
    [com.stuartsierra.component.repl :as component-repl]
+   [malli.core :as m]
    [malli.dev :as mdev]
    [malli.dev.pretty :as mpretty]
-   [malli.core :as m]))
+   [malli.registry :as mr]
+   [malli.experimental.time :as met]))
 
 (component-repl/set-init
  (fn [old-system]
    (let [port (-> (config/read-config) :server :port)]
-     (mdev/start! {:report (mpretty/thrower)})
      (core/api-system {:server {:port port} :db-spec {:jdbcUrl "jdbc:postgresql://localhost:5432/cludio"
                                                       :username "cludio"
                                                       :password "cludio"}}))))
 
 (defn reload []
+  (mdev/start! {:report (mpretty/thrower)})
+  (mr/set-default-registry!
+   (mr/composite-registry
+    (m/default-schemas)
+    (met/schemas)))
   (component-repl/reset))
 
 (comment
