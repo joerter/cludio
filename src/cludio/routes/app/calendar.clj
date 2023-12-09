@@ -31,10 +31,14 @@
   [:map-of :keyword classes-db/ScheduledClasses])
 
 (defn month-view-start
-  "Find the start date to show in the month view based on 42 days and week starting on Sunday"
+  "Find the start date to show in the month view based on 42 days and 
+  week starting on Sunday"
   {:malli/schema [:=> [:cat :time/local-date] :time/local-date]}
   [first-of-month]
-  (let [first-of-month-dow (-> first-of-month (jt/adjust :first-day-of-month) (jt/as :day-of-week))
+  (let [first-of-month-dow (-> 
+                             first-of-month 
+                             (jt/adjust :first-day-of-month) 
+                             (jt/as :day-of-week))
         previous-month-days (if (= 7 first-of-month-dow) 0 first-of-month-dow)]
     (jt/minus first-of-month (jt/days previous-month-days))))
 
@@ -52,7 +56,9 @@
           result
           (recur (rest days)
                  (conj result {:local-date next-day
-                               :current-month? (= (jt/as next-day :month-of-year) month-of-year)
+                               :current-month? (= 
+                                                 (jt/as next-day :month-of-year) 
+                                                 month-of-year)
                                :today? (= next-day today)})))))))
 
 (defn get-classes
