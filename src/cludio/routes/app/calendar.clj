@@ -22,7 +22,7 @@
    [:today? boolean?]])
 
 (def MonthDayWithClasses
-  (mu/merge MonthDay [:map [:classes any?]]))
+  (mu/merge MonthDay [:map [:classes classes-db/ScheduledClasses]]))
 
 (def MonthDays
   [:vector MonthDay])
