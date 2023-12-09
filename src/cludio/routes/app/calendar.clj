@@ -28,7 +28,7 @@
   [:vector MonthDay])
 
 (def ScheduledClassesOnDay
-  [:map-of :keyword any?])
+  [:map-of :keyword classes-db/ScheduledClasses])
 
 (defn month-view-start
   "Find the start date to show in the month view based on 42 days and week starting on Sunday"
